@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 from .models import MembershipApplication
 from .forms import MembershipRegistrationForm
 from .exports import (
@@ -15,8 +16,6 @@ from .exports import (
     export_summary_pdf
 )
 
-
-from django.views.decorators.cache import never_cache
 
 @never_cache
 def home_view(request):
@@ -132,6 +131,7 @@ def logout_view(request):
     return redirect('home')
 
 
+@never_cache
 @login_required(login_url='/login/')
 def member_dashboard_view(request):
     """Teacher / Member Dashboard to view application status, payment verification, and download certificate."""
@@ -226,6 +226,7 @@ def get_filtered_queryset(request):
     return queryset.order_by(order_fields)
 
 
+@never_cache
 @login_required(login_url='/login/')
 def admin_portal_view(request):
     """Administrative dashboard to manage, verify, accept/reject, filter, search, sort, and export."""
@@ -275,6 +276,7 @@ def admin_portal_view(request):
     return render(request, 'membership/admin_portal.html', context)
 
 
+@never_cache
 @login_required(login_url='/login/')
 def admin_quick_action_view(request, pk, action):
     """Unified 1-Click Verification actions: accept (both payment & profile), reject (with reason), and delete."""
@@ -320,6 +322,7 @@ def admin_quick_action_view(request, pk, action):
     return redirect(request.META.get('HTTP_REFERER', 'admin_portal'))
 
 
+@never_cache
 @login_required(login_url='/login/')
 def admin_member_detail_view(request, pk):
     """View full single application details with verification controls and rejection reason."""
@@ -356,6 +359,7 @@ def admin_member_detail_view(request, pk):
     return render(request, 'membership/member_detail.html', {'app': app})
 
 
+@never_cache
 @login_required(login_url='/login/')
 def admin_wings_view(request):
     """Dedicated view for each Wing with counts, sorting, and 1-click dedicated downloads."""
@@ -422,6 +426,7 @@ def admin_wings_view(request):
     return render(request, 'membership/admin_wings.html', context)
 
 
+@never_cache
 @login_required(login_url='/login/')
 def admin_districts_view(request):
     """Dedicated view for each District with counts, sorting, and 1-click dedicated downloads."""
