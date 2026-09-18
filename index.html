@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kerala Selfinancing College Teachers Association – Membership Campaign 2026</title>
+  <meta name="description" content="Join KSCTA Membership Campaign 2026. Register between August 1 – September 15, 2026. United for teachers' rights and dignity." />
+  <meta property="og:title" content="KSCTA – Membership Campaign 2026" />
+  <meta property="og:description" content="Enroll now and be part of the largest teachers' movement in Kerala." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Sans+Malayalam:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #1E88E5; /* Royal Blue */
+      --primary2:  #1565C0; /* Darker Blue */
+      --primary3:  #90CAF9; /* Light Blue */
+      --accent:    #00BFA5; /* Teal / Emerald Green */
+      --accent2:   #00897B; /* Darker Teal */
+      --deep:      #050B14;
+      --navy:      #0A1324;
+      --card-bg:   rgba(255,255,255,0.03);
+      --border:    rgba(255,255,255,0.08);
+      --white:     #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', 'Noto Sans Malayalam', sans-serif;
+      background: var(--deep);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--primary); color: #fff; }
+    img { max-width: 100%; }
+
+    /* ─── PARTICLES ─── */
+    #pc { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:.35; }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:1000;
+      padding: 14px 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(20px);
+      background: rgba(5,11,20,0.8);
+      border-bottom: 1px solid var(--border);
+      transition: padding .3s, background .3s;
+    }
+    nav.scrolled { padding: 10px 5%; background: rgba(5,11,20,.96); }
+    .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .nav-logo .lbadge {
+      width:42px; height:42px; border-radius:10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; font-weight:900; color:#fff;
+      box-shadow: 0 0 18px rgba(30,136,229,.4);
+      flex-shrink:0;
+    }
+    .nav-logo span { font-size:14px; font-weight:700; color:var(--primary3); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#fff; font-weight:700; padding:10px 20px;
+      border-radius:50px; border:none; cursor:pointer;
+      font-size:13px; text-decoration:none;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(0,191,165,.35);
+      white-space:nowrap;
+    }
+    .nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,191,165,.5); }
+
+    /* ─── TICKER ─── */
+    .ticker-wrap {
+      overflow:hidden; background:linear-gradient(90deg, var(--primary), var(--primary2), var(--primary));
+      padding:11px 0; margin-top:68px; position:relative; z-index:1;
+    }
+    .ticker-inner { display:flex; white-space:nowrap; animation:ticker 30s linear infinite; }
+    .ticker-inner span { padding:0 44px; font-size:13px; font-weight:700; color:#fff; letter-spacing:.8px; }
+    .ticker-inner span::after { content:'✦'; margin-left:44px; }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ─── LEADER SPOTLIGHT (2 PHOTOS) ─── */
+    #leader-spotlight {
+      position:relative; z-index:1;
+      background: linear-gradient(135deg, #0A1324 0%, #0D2040 50%, #0A1324 100%);
+      padding: 70px 5% 80px;
+      border-bottom: 1px solid var(--border);
+      overflow:hidden;
+    }
+    #leader-spotlight::before {
+      content:''; position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(30,136,229,.1) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 30%, rgba(0,191,165,.1) 0%, transparent 55%);
+    }
+    .leader-inner {
+      max-width:1100px; margin:0 auto;
+      display:grid; grid-template-columns:1fr 1.2fr; gap:60px; align-items:center;
+      position:relative; z-index:1;
+    }
+    /* Photo Gallery (Overlapping) */
+    .leader-gallery {
+      position: relative;
+      height: 420px;
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto;
+    }
+    .leader-gallery img {
+      position: absolute;
+      border-radius: 24px;
+      object-fit: cover;
+      object-position: top center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      border: 4px solid var(--deep);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s;
+    }
+    .photo-1 {
+      width: 65%;
+      height: 75%;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+    .photo-2 {
+      width: 70%;
+      height: 80%;
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+    }
+    /* Hover effects for photos */
+    .leader-gallery:hover .photo-1 { transform: scale(1.05) translate(-10px, -10px); }
+    .leader-gallery:hover .photo-2 { transform: scale(1.05) translate(10px, 10px); z-index: 3; }
+
+    .leader-badge-row {
+      display:flex; justify-content:center; gap:8px; margin-top:30px; flex-wrap:wrap;
+      position: relative; z-index: 5;
+    }
+    .leader-badge {
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+      padding:6px 16px; border-radius:50px; font-size:12px; font-weight:600;
+      color:rgba(255,255,255,.8);
+    }
+    .leader-badge.primary { border-color:rgba(30,136,229,.4); color:var(--primary3); background:rgba(30,136,229,.1); }
+
+    /* Text side */
+    .spotlight-label {
+      font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+      color:var(--accent); margin-bottom:16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .spotlight-label::before {
+      content:''; width:40px; height:2px;
+      background:linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .spotlight-name {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight:900; line-height:1.1; margin-bottom:10px;
+      background: linear-gradient(135deg, #fff 0%, var(--primary3) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .spotlight-title {
+      font-size:clamp(16px,2vw,20px); color:var(--primary); font-weight:600; margin-bottom:24px;
+    }
+    .spotlight-org {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(0,191,165,.1); border:1px solid rgba(0,191,165,.3);
+      color:var(--accent); padding:10px 22px; border-radius:50px; font-size:14px; font-weight:600;
+      margin-bottom:28px;
+    }
+    .spotlight-desc {
+      font-size:clamp(15px,1.8vw,17px);
+      color:rgba(255,255,255,.7); line-height:1.8; margin-bottom:28px;
+    }
+    .spotlight-quote {
+      border-left:4px solid var(--accent);
+      padding:20px 24px; border-radius:0 16px 16px 0;
+      background:rgba(0,191,165,.05);
+      font-size:clamp(16px,2vw,19px); font-style:italic;
+      color:rgba(255,255,255,.9); line-height:1.6;
+    }
+    .spotlight-quote::before { content:'\201C'; color:var(--accent); font-size:32px; line-height:0; vertical-align:-10px; margin-right:6px; opacity:0.5;}
+
+    /* ─── HERO ─── */
+    #hero {
+      position:relative; z-index:1; min-height:90vh;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; padding:100px 5% 80px;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(30,136,229,.15) 0%, transparent 65%),
+        radial-gradient(ellipse at 80% 80%, rgba(0,191,165,.1) 0%, transparent 50%);
+    }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(30,136,229,.1); border:1px solid rgba(30,136,229,.3);
+      color:var(--primary3); padding:8px 20px; border-radius:50px;
+      font-size:12px; font-weight:700; letter-spacing:1.5px; margin-bottom:24px;
+      animation: fadeUp .7s ease both;
+    }
+    .badge-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    .hero-org { font-size:clamp(12px,1.8vw,15px); font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:16px; animation:fadeDown .7s .1s ease both; }
+    .hero-title {
+      font-size:clamp(34px,7vw,88px); font-weight:900; line-height:1.1; margin-bottom:24px;
+      background:linear-gradient(135deg, #fff 0%, var(--primary3) 45%, var(--accent) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      animation:fadeUp .8s .15s ease both;
+    }
+    .hero-sub {
+      font-size:clamp(16px,2.2vw,22px); color:rgba(255,255,255,.65);
+      max-width:650px; line-height:1.75; margin-bottom:40px;
+      animation:fadeUp .8s .2s ease both;
+    }
+    .hero-dates {
+      display:inline-flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center;
+      background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:50px;
+      padding:14px 32px; margin-bottom:48px; font-size:15px; font-weight:600;
+      animation:fadeUp .8s .25s ease both;
+    }
+    .hero-dates .arr { color:var(--accent); font-size:20px; }
+    .hero-btns { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; animation:fadeUp .8s .3s ease both; }
+    .btn-primary {
+      background:linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff; font-weight:800; font-size:17px; padding:18px 44px;
+      border-radius:50px; border:none; cursor:pointer; text-decoration:none;
+      box-shadow:0 8px 28px rgba(30,136,229,.35);
+      transition:transform .25s, box-shadow .25s; position:relative; overflow:hidden;
+    }
+    .btn-primary::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent); transition:left .5s; }
+    .btn-primary:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 14px 36px rgba(30,136,229,.5); }
+    .btn-primary:hover::after { left:100%; }
+    .btn-secondary {
+      background:transparent; color:#fff; font-weight:600; font-size:17px;
+      padding:17px 40px; border-radius:50px; border:1.5px solid rgba(255,255,255,.25);
+      cursor:pointer; text-decoration:none; transition:all .25s;
+    }
+    .btn-secondary:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,191,165,.06); }
+
+    /* ─── COUNTDOWN ─── */
+    #countdown {
+      position:relative; z-index:1;
+      padding:80px 5%;
+      background:linear-gradient(135deg, rgba(10,19,36,.9), rgba(15,35,75,.4));
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    }
+    .sec-label { text-align:center; font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+    .sec-title { text-align:center; font-size:clamp(28px,4vw,46px); font-weight:800; margin-bottom:50px; }
+    .sec-title span { color:var(--primary); }
+    .sec-divider { height:2px; max-width:80px; margin:0 auto 44px; background:linear-gradient(90deg,transparent,var(--primary),transparent); }
+
+    /* Campaign window dates */
+    .campaign-window {
+      display:flex; justify-content:center; align-items:center; gap:20px;
+      flex-wrap:wrap; margin-bottom:44px;
+    }
+    .cw-pill {
+      background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+      border-radius:20px; padding:20px 32px; text-align:center;
+      min-width:180px;
+    }
+    .cw-pill.start { border-color:rgba(30,136,229,.3); background:rgba(30,136,229,.05); }
+    .cw-pill.end   { border-color:rgba(0,191,165,.3); background:rgba(0,191,165,.05); }
+    .cw-date { font-size:clamp(18px,2.5vw,24px); font-weight:800; margin-bottom:6px; }
+    .cw-pill.start .cw-date { color:var(--primary3); }
+    .cw-pill.end .cw-date   { color:var(--accent); }
+    .cw-sub { font-size:12px; color:rgba(255,255,255,.5); font-weight:700; letter-spacing:1px; }
+    .cw-arrow { font-size:32px; color:rgba(255,255,255,.2); }
+
+    .cd-grid { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-bottom:28px; }
+    .cd-card {
+      background:linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+      border:1px solid rgba(30,136,229,.2); border-radius:20px;
+      padding:28px 32px; text-align:center; min-width:120px;
+      backdrop-filter:blur(10px); position:relative; overflow:hidden;
+      transition:transform .3s, box-shadow .3s;
+    }
+    .cd-card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(30,136,229,.15); }
+    .cd-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, transparent, var(--primary), transparent); }
+    .cd-num { font-size:clamp(44px,7vw,72px); font-weight:900; line-height:1; background:linear-gradient(135deg, var(--primary3), var(--white)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .cd-lbl { font-size:12px; font-weight:700; color:var(--accent); letter-spacing:2px; margin-top:8px; }
+
+    #cd-status { text-align:center; font-size:15px; color:rgba(255,255,255,.6); }
+    #cd-status strong { color:var(--primary3); }
+
+    /* Progress */
+    .prog-wrap { max-width:600px; margin:32px auto 0; }
+    .prog-labels { display:flex; justify-content:space-between; font-size:13px; color:rgba(255,255,255,.5); margin-bottom:10px; font-weight:600; }
+    .prog-track { background:rgba(255,255,255,.05); border-radius:50px; height:10px; overflow:hidden; box-shadow:inset 0 2px 5px rgba(0,0,0,0.2); }
+    .prog-fill { height:100%; border-radius:50px; background:linear-gradient(90deg, var(--primary), var(--accent)); transition:width 1.5s ease; width:0; }
+
+    /* ─── ABOUT ─── */
+    #about { position:relative; z-index:1; padding:90px 5%; }
+    .about-grid { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+    .about-svg-wrap {
+      border-radius:24px; overflow:hidden;
+      border:2px solid rgba(30,136,229,.2);
+      box-shadow:0 20px 60px rgba(0,0,0,.4);
+    }
+    .about-content .sec-title { text-align:left; }
+    .about-desc { color:rgba(255,255,255,.65); line-height:1.8; font-size:16px; margin-bottom:16px; }
+    .about-pts { list-style:none; margin-top:24px; }
+    .about-pts li { display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; color:rgba(255,255,255,.75); font-size:15px; }
+    .apt-icon { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; margin-top:2px; }
+
+    /* ─── STATS ─── */
+    #stats {
+      position:relative; z-index:1; padding:80px 5%;
+      background:linear-gradient(135deg, rgba(30,136,229,.05), rgba(0,191,165,.05));
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    }
+    .stats-grid { max-width:900px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+    .stat-card { text-align:center; padding:40px 20px; background:var(--card-bg); border:1px solid var(--border); border-radius:20px; backdrop-filter:blur(10px); transition:transform .3s; }
+    .stat-card:hover { transform:translateY(-6px); border-color:rgba(30,136,229,.3); }
+    .stat-num { font-size:clamp(38px,5vw,56px); font-weight:900; background:linear-gradient(135deg, var(--primary3), var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .stat-lbl { font-size:13px; color:rgba(255,255,255,.5); font-weight:600; margin-top:8px; }
+
+    /* ─── BENEFITS ─── */
+    #benefits {
+      position:relative; z-index:1; padding:90px 5%;
+      background:linear-gradient(135deg, rgba(10,19,36,.6), transparent);
+      border-top:1px solid var(--border);
+    }
+    .benefits-grid { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+    .ben-card {
+      background:var(--card-bg); border:1px solid var(--border); border-radius:20px;
+      padding:36px 28px; transition:all .35s; position:relative; overflow:hidden;
+    }
+    .ben-card::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(30,136,229,.08), transparent); opacity:0; transition:opacity .35s; }
+    .ben-card:hover { transform:translateY(-6px); border-color:rgba(30,136,229,.4); box-shadow:0 16px 40px rgba(0,0,0,.3); }
+    .ben-card:hover::after { opacity:1; }
+    .ben-icon { font-size:40px; margin-bottom:18px; display:block; }
+    .ben-title { font-size:19px; font-weight:700; margin-bottom:10px; color:#fff; }
+    .ben-desc { font-size:14px; color:rgba(255,255,255,.55); line-height:1.7; }
+
+    /* ─── CTA ─── */
+    #cta {
+      position:relative; z-index:1; padding:100px 5%; text-align:center;
+      background:radial-gradient(ellipse at 50% 50%, rgba(30,136,229,.2) 0%, transparent 70%);
+      border-top:1px solid var(--border); overflow:hidden;
+    }
+    #cta::before {
+      content:''; position:absolute; inset:0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .cta-title { font-size:clamp(32px,5vw,58px); font-weight:900; margin-bottom:18px; }
+    .cta-title span { color:var(--accent); }
+    .cta-sub { font-size:clamp(15px,2vw,19px); color:rgba(255,255,255,.6); margin-bottom:48px; max-width:600px; margin-inline:auto; }
+    .cta-box {
+      display:inline-block;
+      background:linear-gradient(135deg, rgba(30,136,229,.1), rgba(0,191,165,.08));
+      border:1px solid rgba(30,136,229,.3); border-radius:24px;
+      padding:44px 64px; margin-bottom:36px;
+    }
+    .btn-mega {
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#fff; font-weight:900; font-size:20px;
+      padding:22px 64px; border-radius:60px; border:none;
+      cursor:pointer; text-decoration:none; display:inline-block;
+      box-shadow:0 10px 40px rgba(0,191,165,.4);
+      transition:all .3s; letter-spacing:.5px; position:relative; overflow:hidden;
+    }
+    .btn-mega::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent); transition:left .5s; }
+    .btn-mega:hover { transform:translateY(-4px) scale(1.03); box-shadow:0 18px 50px rgba(0,191,165,.6); }
+    .btn-mega:hover::after { left:100%; }
+    .cta-link { color:rgba(255,255,255,.4); font-size:14px; margin-top:20px; }
+    .cta-link a { color:rgba(255,255,255,.6); text-decoration: underline; }
+    .cta-link a:hover { color:var(--primary3); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      position:relative; z-index:1;
+      background:rgba(3,7,14,.98); border-top:1px solid var(--border);
+      padding:60px 5% 30px; 
+    }
+    .footer-content {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 40px;
+    }
+    .footer-brand {
+      max-width: 300px;
+    }
+    .foot-logo { font-size:22px; font-weight:800; color:var(--primary3); margin-bottom:8px; }
+    .foot-tag { font-size:14px; color:rgba(255,255,255,.4); margin-bottom:8px; line-height: 1.5; }
+    
+    .footer-dev {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 24px;
+      border-radius: 16px;
+      text-align: right;
+    }
+    .dev-title {
+      font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 6px;
+    }
+    .dev-name {
+      font-size: 18px; font-weight: 800; color: var(--accent); margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .dev-links {
+      display: flex; gap: 12px; justify-content: flex-end;
+    }
+    .dev-link {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.06);
+      padding: 8px 14px; border-radius: 8px;
+      color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .dev-link:hover {
+      background: rgba(30,136,229,0.15);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .dev-link.insta:hover { background: rgba(225, 48, 108, 0.15); color: #E1306C; }
+    .dev-link.linkedin:hover { background: rgba(0, 119, 181, 0.15); color: #0077b5; }
+    .dev-link.portfolio:hover { background: rgba(0, 191, 165, 0.15); color: var(--accent); }
+
+    .foot-bottom { 
+      font-size:12px; color:rgba(255,255,255,.3); 
+      margin-top:40px; padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+    }
+
+    /* ─── REVEAL ─── */
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    /* ══════════════════════════
+       RESPONSIVE
+    ══════════════════════════ */
+
+    /* Tablet (≤900px) */
+    @media (max-width:900px) {
+      .leader-inner { grid-template-columns:1fr; gap:40px; text-align:center; }
+      .leader-gallery { margin-bottom: 30px; }
+      .spotlight-label { justify-content:center; }
+      .spotlight-quote { text-align:left; }
+      .about-grid { grid-template-columns:1fr; }
+      .about-content .sec-title { text-align:center; }
+      .stats-grid { grid-template-columns:repeat(2,1fr); }
+      .benefits-grid { grid-template-columns:repeat(2,1fr); }
+      .footer-content { flex-direction: column; align-items: center; text-align: center; }
+      .footer-dev { text-align: center; width: 100%; max-width: 400px; }
+      .dev-links { justify-content: center; flex-wrap: wrap; }
+    }
+
+    /* Mobile (≤600px) */
+    @media (max-width:600px) {
+      nav { padding:12px 4%; }
+      .nav-logo span { font-size:12px; }
+      .nav-cta { padding:8px 14px; font-size:12px; }
+
+      .ticker-inner span { font-size:12px; padding:0 28px; }
+
+      #leader-spotlight { padding:50px 4% 60px; }
+      .leader-gallery { height: 320px; max-width: 320px; }
+
+      #hero { padding:90px 4% 70px; }
+      .hero-dates { padding:12px 20px; font-size:14px; gap:10px; }
+      .hero-btns { gap:12px; }
+      .btn-primary, .btn-secondary { font-size:15px; padding:15px 32px; }
+
+      #countdown { padding:60px 4%; }
+      .cd-card { min-width:90px; padding:20px 16px; }
+      .cd-num { font-size:42px; }
+      .cw-pill { min-width:140px; padding:16px 20px; }
+
+      #about { padding:70px 4%; }
+      #stats { padding:60px 4%; }
+      .stats-grid { gap:16px; }
+      .stat-card { padding:30px 14px; }
+
+      #benefits { padding:70px 4%; }
+      .benefits-grid { grid-template-columns:1fr; }
+
+      #cta { padding:80px 4%; }
+      .cta-box { padding:32px 24px; }
+      .btn-mega { font-size:16px; padding:18px 40px; }
+
+      footer { padding:40px 4% 20px; }
+    }
+
+    /* Very small (≤380px) */
+    @media (max-width:380px) {
+      .cd-card { min-width:75px; padding:16px 12px; }
+      .cd-num { font-size:36px; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="pc"></canvas>
+
+<!-- NAV -->
+<nav id="mainnav">
+  <a href="#" class="nav-logo">
+    <div class="lbadge">K</div>
+    <span>KSCTA</span>
+  </a>
+  <a href="https://form.svhrt.com/6a63338208fab3b6f580d5dc" target="_blank" id="nav-btn" class="nav-cta">✍️ Register Now</a>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <span>Membership Campaign 2026</span>
+    <span>August 1 – September 15, 2026</span>
+    <span>Kerala Selfinancing College Teachers Association</span>
+    <span>United We Stand for Teachers' Rights</span>
+    <span>Register Now – Limited Period</span>
+    <span>Membership Campaign 2026</span>
+    <span>August 1 – September 15, 2026</span>
+    <span>Kerala Selfinancing College Teachers Association</span>
+    <span>United We Stand for Teachers' Rights</span>
+    <span>Register Now – Limited Period</span>
+  </div>
+</div>
+
+<!-- ★ RAHUL GANDHI SPOTLIGHT (2 PHOTOS) ★ -->
+<section id="leader-spotlight">
+  <div class="leader-inner">
+    <!-- Photo Gallery -->
+    <div class="leader-gallery">
+      <!-- First Photo -->
+      <img src="image.png" alt="Rahul Gandhi 1" class="photo-1" onerror="this.src='https://via.placeholder.com/240x280/1565C0/FFFFFF?text=Photo+1'" />
+      <!-- Second Photo -->
+      <img src="image copy.png" alt="Rahul Gandhi 2" class="photo-2" onerror="this.src='https://via.placeholder.com/220x250/00BFA5/FFFFFF?text=Photo+2'" />
+      
+      <div class="leader-badge-row">
+        <span class="leader-badge primary">Indian National Congress</span>
+        <span class="leader-badge">Leader of Opposition</span>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <div class="leader-text-col">
+      <div class="spotlight-label">Chief Patron &amp; Inspiration</div>
+      <h2 class="spotlight-name">Rahul Gandhi</h2>
+      <p class="spotlight-title">Leader of the Opposition, Lok Sabha</p>
+      <div class="spotlight-org">
+        🏛️ Indian National Congress · Wayanad &amp; Rae Bareli MP
+      </div>
+      <p class="spotlight-desc">
+        Shri Rahul Gandhi, the Leader of the Opposition in the 18th Lok Sabha, has been a tireless voice 
+        for the rights of working people across India — including teachers, laborers, and the marginalized.  
+        His Bharat Jodo mission resonates deeply with KSCTA's vision of united advocacy for teachers' dignity 
+        and fair treatment in Kerala's self-financing institutions.
+      </p>
+      <blockquote class="spotlight-quote">
+        "When teachers are empowered, the nation is empowered. Every educator deserves respect, security, and justice."
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge"><span class="badge-dot"></span>MEMBERSHIP CAMPAIGN 2026 · NOW OPEN</div>
+  <p class="hero-org">Kerala Selfinancing College Teachers Association</p>
+  <h1 class="hero-title">ഒന്നിച്ച് ശക്തരാകാം<br/>Join the Movement</h1>
+  <p class="hero-sub">Empowering teachers across Kerala's self-financing colleges.<br/>Your voice. Your rights. Your future — together.</p>
+  <div class="hero-dates">
+    <span>📅 August 1, 2026</span>
+    <span class="arr">→</span>
+    <span>September 15, 2026</span>
+  </div>
+  <div class="hero-btns">
+    <a href="https://form.svhrt.com/6a63338208fab3b6f580d5dc" target="_blank" id="hero-btn" class="btn-primary">✍️ Become a Member</a>
+    <a href="#about" class="btn-secondary">Learn More</a>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdown">
+  <p class="sec-label">Campaign Window</p>
+  <h2 class="sec-title" id="cd-heading">Registration <span>Countdown</span></h2>
+
+  <!-- Campaign window pills -->
+  <div class="campaign-window">
+    <div class="cw-pill start">
+      <div class="cw-date">Aug 1, 2026</div>
+      <div class="cw-sub">🔵 CAMPAIGN STARTS</div>
+    </div>
+    <div class="cw-arrow">→</div>
+    <div class="cw-pill end">
+      <div class="cw-date">Sep 15, 2026</div>
+      <div class="cw-sub">🟢 CAMPAIGN ENDS</div>
+    </div>
+  </div>
+
+  <div class="cd-grid">
+    <div class="cd-card"><div class="cd-num" id="cd-d">00</div><div class="cd-lbl">DAYS</div></div>
+    <div class="cd-card"><div class="cd-num" id="cd-h">00</div><div class="cd-lbl">HOURS</div></div>
+    <div class="cd-card"><div class="cd-num" id="cd-m">00</div><div class="cd-lbl">MINUTES</div></div>
+    <div class="cd-card"><div class="cd-num" id="cd-s">00</div><div class="cd-lbl">SECONDS</div></div>
+  </div>
+  <p id="cd-status">Counting down to <strong>August 1, 2026</strong></p>
+
+  <div class="prog-wrap">
+    <div class="prog-labels"><span>Aug 1</span><span>Campaign Progress</span><span>Sep 15</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid reveal">
+    <div class="about-svg-wrap">
+      <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:linear-gradient(135deg,#0A1324,#0D2040)">
+        <defs>
+          <linearGradient id="ga" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1E88E5"/>
+            <stop offset="100%" style="stop-color:#90CAF9"/>
+          </linearGradient>
+          <linearGradient id="gb" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00BFA5"/>
+            <stop offset="100%" style="stop-color:#00897B"/>
+          </linearGradient>
+        </defs>
+        <circle cx="240" cy="140" r="90" fill="rgba(30,136,229,0.08)" stroke="rgba(30,136,229,0.2)" stroke-width="2"/>
+        <circle cx="240" cy="140" r="60" fill="rgba(30,136,229,0.1)" stroke="rgba(30,136,229,0.15)" stroke-width="1"/>
+        <rect x="205" y="107" width="70" height="56" rx="5" fill="none" stroke="url(#ga)" stroke-width="2.5"/>
+        <line x1="240" y1="107" x2="240" y2="163" stroke="url(#ga)" stroke-width="2"/>
+        <line x1="210" y1="122" x2="236" y2="122" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <line x1="210" y1="132" x2="236" y2="132" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <line x1="210" y1="142" x2="236" y2="142" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <line x1="244" y1="122" x2="270" y2="122" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <line x1="244" y1="132" x2="270" y2="132" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <line x1="244" y1="142" x2="270" y2="142" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <text x="240" y="232" text-anchor="middle" font-family="Outfit,sans-serif" font-size="20" font-weight="900" fill="url(#ga)">KSCTA</text>
+        <text x="240" y="254" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" fill="rgba(255,255,255,0.5)">Kerala Selfinancing College</text>
+        <text x="240" y="270" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" fill="rgba(255,255,255,0.5)">Teachers Association</text>
+        <text x="120" y="75" font-size="18" fill="#90CAF9" opacity="0.55">★</text>
+        <text x="350" y="60" font-size="14" fill="#00BFA5" opacity="0.5">★</text>
+        <text x="70" y="200" font-size="11" fill="#90CAF9" opacity="0.4">✦</text>
+        <text x="400" y="190" font-size="13" fill="#00BFA5" opacity="0.4">✦</text>
+        <circle cx="130" cy="310" r="24" fill="rgba(30,136,229,0.15)" stroke="rgba(30,136,229,0.3)" stroke-width="1.5"/>
+        <text x="130" y="318" text-anchor="middle" font-size="20">👩‍🏫</text>
+        <circle cx="240" cy="320" r="24" fill="rgba(0,191,165,0.15)" stroke="rgba(0,191,165,0.3)" stroke-width="1.5"/>
+        <text x="240" y="328" text-anchor="middle" font-size="20">📚</text>
+        <circle cx="350" cy="310" r="24" fill="rgba(30,136,229,0.15)" stroke="rgba(30,136,229,0.3)" stroke-width="1.5"/>
+        <text x="350" y="318" text-anchor="middle" font-size="20">👨‍🏫</text>
+      </svg>
+    </div>
+    <div class="about-content">
+      <p class="sec-label" style="text-align:left">Who We Are</p>
+      <h2 class="sec-title">About <span>KSCTA</span></h2>
+      <p class="about-desc"><strong style="color:#fff">Kerala Selfinancing College Teachers Association (KSCTA)</strong> is the premier organization representing teachers across hundreds of self-financing colleges in Kerala. We stand as a unified voice for the rights, dignity, and welfare of thousands of dedicated educators.</p>
+      <p class="about-desc">Self-financing college teachers form the backbone of higher education in Kerala, yet they often face challenges in pay parity, job security, and professional growth. KSCTA exists to change that — through solidarity, advocacy, and collective action.</p>
+      <ul class="about-pts">
+        <li><span class="apt-icon">✓</span> Fighting for equal pay and service conditions for all teachers</li>
+        <li><span class="apt-icon">✓</span> Legal aid and support for members facing unfair treatment</li>
+        <li><span class="apt-icon">✓</span> Professional development and training opportunities</li>
+        <li><span class="apt-icon">✓</span> Strong representation before the government and UGC</li>
+        <li><span class="apt-icon">✓</span> Network of thousands of dedicated educators statewide</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <p class="sec-label">Our Strength</p>
+  <h2 class="sec-title reveal">By the <span>Numbers</span></h2>
+  <div class="sec-divider"></div>
+  <div class="stats-grid reveal">
+    <div class="stat-card"><div class="stat-num" data-target="500">0</div><div class="stat-lbl">+ Colleges</div></div>
+    <div class="stat-card"><div class="stat-num" data-target="15000">0</div><div class="stat-lbl">+ Members</div></div>
+    <div class="stat-card"><div class="stat-num" data-target="14">0</div><div class="stat-lbl">Districts Covered</div></div>
+    <div class="stat-card"><div class="stat-num" data-target="10">0</div><div class="stat-lbl">+ Years of Service</div></div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section id="benefits">
+  <p class="sec-label">Why Join?</p>
+  <h2 class="sec-title reveal">Membership <span>Benefits</span></h2>
+  <div class="sec-divider"></div>
+  <div class="benefits-grid reveal">
+    <div class="ben-card"><span class="ben-icon">⚖️</span><h3 class="ben-title">Legal Protection</h3><p class="ben-desc">Access to legal aid and expert support when you face unfair dismissal, delayed salaries, or violation of service conditions.</p></div>
+    <div class="ben-card"><span class="ben-icon">💰</span><h3 class="ben-title">Pay Parity Advocacy</h3><p class="ben-desc">We fight relentlessly for equal pay, UGC scale salaries, and proper service benefits for all self-financing college teachers.</p></div>
+    <div class="ben-card"><span class="ben-icon">🤝</span><h3 class="ben-title">Collective Strength</h3><p class="ben-desc">Join 15,000+ teachers across Kerala. Together we negotiate, advocate, and achieve what individuals cannot.</p></div>
+    <div class="ben-card"><span class="ben-icon">📚</span><h3 class="ben-title">Professional Development</h3><p class="ben-desc">Workshops, seminars, and training programs to help you grow professionally and stay ahead in your field.</p></div>
+    <div class="ben-card"><span class="ben-icon">🏛️</span><h3 class="ben-title">Government Representation</h3><p class="ben-desc">Direct representation to the Kerala Government, UGC, AICTE, and other bodies on matters affecting teachers.</p></div>
+    <div class="ben-card"><span class="ben-icon">🌐</span><h3 class="ben-title">State-wide Network</h3><p class="ben-desc">Connect with colleagues from all 14 districts of Kerala. Share experiences, opportunities, and solutions.</p></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <p class="sec-label">Join Today</p>
+  <h2 class="cta-title reveal">Ready to <span>Unite?</span></h2>
+  <p class="cta-sub reveal">Don't miss the Membership Campaign window. Register between <strong style="color:var(--primary3)">August 1 – September 15, 2026</strong> and be part of the change.</p>
+  <div class="cta-box reveal">
+    <a href="https://form.svhrt.com/6a63338208fab3b6f580d5dc" target="_blank" id="cta-btn" class="btn-mega">✍️ Click Here to Register</a>
+    <div class="cta-link">Direct link: <a href="https://form.svhrt.com/6a63338208fab3b6f580d5dc" target="_blank">form.svhrt.com/6a63338208fab3b6f580d5dc</a></div>
+  </div>
+  <p class="reveal" style="color:rgba(255,255,255,.4);font-size:14px">📋 Free registration for all eligible teachers of Kerala's self-financing colleges</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-brand">
+      <div class="foot-logo">KSCTA</div>
+      <div class="foot-tag">Kerala Selfinancing College Teachers Association</div>
+      <div class="foot-tag" style="color:var(--primary3)">Membership Campaign 2026<br/>Aug 1 – Sep 15</div>
+    </div>
+    
+    <div class="footer-dev">
+      <div class="dev-title">Designed &amp; Developed By</div>
+      <div class="dev-name">Muhammed Anas MA</div>
+      <div class="dev-links">
+        <a href="https://anasma123.github.io/Portfolio/" target="_blank" class="dev-link portfolio">🌐 Portfolio</a>
+        <a href="https://www.linkedin.com/in/Muhammedanasma" target="_blank" class="dev-link linkedin">💼 LinkedIn</a>
+        <a href="https://www.instagram.com/muhammed_anas_ma" target="_blank" class="dev-link insta">📸 Instagram</a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="foot-bottom">&copy; 2026 Kerala Selfinancing College Teachers Association. All rights reserved.</div>
+</footer>
+
+<script>
+/* ─── PARTICLES ─── */
+(function(){
+  const c = document.getElementById('pc'), ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W=c.width=window.innerWidth; H=c.height=window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  function r(a,b){ return Math.random()*(b-a)+a; }
+  class P {
+    constructor(){ this.reset(); }
+    reset(){ this.x=r(0,W); this.y=r(0,H); this.rad=r(.8,2.5); this.vx=r(-.25,.25); this.vy=r(-.4,-.08); this.a=r(.3,.75); this.col=Math.random()<.5?`rgba(30,136,229,${this.a})`:`rgba(0,191,165,${this.a})`; }
+    tick(){ this.x+=this.vx; this.y+=this.vy; if(this.y<-4) this.reset(); }
+    draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.rad,0,Math.PI*2); ctx.fillStyle=this.col; ctx.fill(); }
+  }
+  for(let i=0;i<90;i++) pts.push(new P());
+  function loop(){ ctx.clearRect(0,0,W,H); pts.forEach(p=>{p.tick();p.draw();}); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ─── NAV SCROLL ─── */
+window.addEventListener('scroll', ()=> document.getElementById('mainnav').classList.toggle('scrolled', scrollY>50));
+
+/* ─── COUNTDOWN ─── */
+function pad(n){ return String(n).padStart(2,'0'); }
+function runCountdown(){
+  const now   = new Date();
+  const start = new Date('2026-08-01T00:00:00+05:30');
+  const end   = new Date('2026-09-15T23:59:59+05:30');
+
+  let target, status, pct = 0;
+
+  if(now < start){
+    target = start;
+    const diff = start - now;
+    const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000),
+          m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+    document.getElementById('cd-d').textContent=pad(d);
+    document.getElementById('cd-h').textContent=pad(h);
+    document.getElementById('cd-m').textContent=pad(m);
+    document.getElementById('cd-s').textContent=pad(s);
+    document.getElementById('cd-status').innerHTML='⏳ Campaign starts in <strong>'+d+' days, '+h+' hours</strong>';
+    pct=0;
+  } else if(now<=end){
+    document.getElementById('cd-heading').innerHTML='Campaign is <span>LIVE!</span>';
+    const diff = end - now;
+    const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000),
+          m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+    document.getElementById('cd-d').textContent=pad(d);
+    document.getElementById('cd-h').textContent=pad(h);
+    document.getElementById('cd-m').textContent=pad(m);
+    document.getElementById('cd-s').textContent=pad(s);
+    document.getElementById('cd-status').innerHTML='🔵 Campaign is <strong>LIVE</strong> — <strong>'+d+' days '+h+' hrs</strong> left to register!';
+    pct = ((now-start)/(end-start))*100;
+  } else {
+    ['cd-d','cd-h','cd-m','cd-s'].forEach(id=>document.getElementById(id).textContent='00');
+    document.getElementById('cd-status').innerHTML='✅ Campaign <strong>ended</strong>. Thank you!';
+    document.getElementById('cd-heading').innerHTML='Campaign <span>Ended</span>';
+    pct=100;
+  }
+  document.getElementById('prog-fill').style.width = Math.min(100,pct).toFixed(1)+'%';
+}
+runCountdown(); setInterval(runCountdown,1000);
+setTimeout(()=>document.getElementById('prog-fill').style.transition='width 1.5s ease',200);
+
+/* ─── COUNTER ANIMATION ─── */
+let counted = false;
+function animateCounters(){
+  if(counted) return; counted=true;
+  document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+    const t=parseInt(el.dataset.target), dur=2000, step=t/(dur/16);
+    let cur=0;
+    const timer=setInterval(()=>{ cur=Math.min(cur+step,t); el.textContent=Math.floor(cur).toLocaleString(); if(cur>=t) clearInterval(timer); },16);
+  });
+}
+
+/* ─── SCROLL REVEAL ─── */
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      if(e.target.closest('#stats')) animateCounters();
+    }
+  });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

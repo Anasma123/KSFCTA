@@ -1,0 +1,76 @@
+{% extends 'membership/base.html' %}
+{% load static %}
+
+{% block title %}Registration Successful | KSFCTA Membership Campaign 2026{% endblock %}
+
+{% block content %}
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="{% url 'home' %}" class="brand-wrapper">
+      <img src="{% static 'images/logo.png' %}" alt="KSFCTA Logo" class="brand-logo" />
+      <div class="brand-text">
+        <h1>KERALA SELF FINANCING COLLEGE TEACHERS’ ASSOCIATION</h1>
+        <p>Reg. No.: TVM/TC/425/2023</p>
+      </div>
+    </a>
+  </div>
+</header>
+
+<main class="container" style="padding: 60px 24px; min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+  <div style="width: 100%; max-width: 680px; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 48px; text-align: center;">
+    
+    <div style="width: 72px; height: 72px; border-radius: 50%; background: #D1FAE5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 20px;">
+      ✓
+    </div>
+
+    <h2 style="font-size: 2rem; color: var(--primary-navy); margin-bottom: 8px;">Registration Successful!</h2>
+    <p style="font-size: 1.05rem; color: var(--text-muted); margin-bottom: 24px;">
+      Thank you for joining the Kerala Self Financing College Teachers’ Association.
+    </p>
+
+    <!-- Slip Box -->
+    <div style="background: var(--bg-subtle); border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 24px; text-align: left; margin-bottom: 32px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Application Reference</span>
+        <span style="font-size: 1.25rem; font-weight: 800; color: var(--primary-blue);">{{ app.application_no }}</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.92rem;">
+        <div>
+          <span style="color: var(--text-muted);">Applicant Name:</span><br/>
+          <strong>{{ app.full_name }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted);">Institution:</span><br/>
+          <strong>{{ app.institution }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted);">Designation &amp; Dept:</span><br/>
+          <strong>{{ app.designation }}, {{ app.department }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted);">Membership Type:</span><br/>
+          <strong>{{ app.membership_type }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Download Options -->
+    <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 28px;">
+      <a href="{% url 'export_single_docx' app.id %}" class="btn btn-primary" style="background: #1E40AF; padding: 12px 24px;">
+        📘 Download Word Application (.docx)
+      </a>
+      <a href="{% url 'export_single_pdf' app.id %}" class="btn btn-primary" style="background: #DC2626; padding: 12px 24px;">
+        📕 Download Official PDF Form
+      </a>
+    </div>
+
+    <div>
+      <a href="{% url 'home' %}" class="btn btn-outline" style="padding: 10px 24px;">
+        ← Back to Home Page
+      </a>
+    </div>
+
+  </div>
+</main>
+{% endblock %}
