@@ -12,6 +12,27 @@
 </head>
 <body>
 
+  <!-- Global Toast Notifications -->
+  {% if messages %}
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+      {% for message in messages %}
+      <div class="toast-message" style="background: #D1FAE5; border-left: 4px solid #10B981; color: #065F46; padding: 14px 20px; border-radius: 4px; font-size: 0.92rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 8px; transition: opacity 0.5s ease, transform 0.5s ease;">
+        ✅ {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(function() {
+        const toasts = document.querySelectorAll('.toast-message');
+        toasts.forEach(toast => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+          setTimeout(() => toast.remove(), 500);
+        });
+      }, 3000); // Popup disappears after 3 seconds
+    </script>
+  {% endif %}
+
   {% block content %}{% endblock %}
 
   {% block extra_js %}{% endblock %}

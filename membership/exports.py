@@ -23,6 +23,8 @@ import pypdf
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+import base64
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -449,11 +451,21 @@ def export_letterhead_certificate_pdf(app):
     photo_drawn = False
     if app.photo:
         try:
-            photo_path = app.photo.path if hasattr(app.photo, 'path') else str(app.photo)
-            if os.path.exists(photo_path):
-                can.drawImage(photo_path, photo_x + 2, photo_y + 2, width=photo_w - 4, height=photo_h - 4, preserveAspectRatio=True, anchor='c')
+            photo_str = str(app.photo)
+            if photo_str.startswith('data:image'):
+                # Extract the base64 part
+                header, encoded = photo_str.split(',', 1)
+                image_data = base64.b64decode(encoded)
+                image_io = io.BytesIO(image_data)
+                img_reader = ImageReader(image_io)
+                can.drawImage(img_reader, photo_x + 2, photo_y + 2, width=photo_w - 4, height=photo_h - 4, preserveAspectRatio=True, anchor='c')
                 photo_drawn = True
-        except Exception:
+            else:
+                photo_path = app.photo.path if hasattr(app.photo, 'path') else photo_str
+                if os.path.exists(photo_path):
+                    can.drawImage(photo_path, photo_x + 2, photo_y + 2, width=photo_w - 4, height=photo_h - 4, preserveAspectRatio=True, anchor='c')
+                    photo_drawn = True
+        except Exception as e:
             photo_drawn = False
 
     if not photo_drawn:
