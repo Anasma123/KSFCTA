@@ -25,13 +25,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Enforce secure cookies in production (Vercel is HTTPS)
-if os.environ.get('VERCEL'):
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    # Ensure CSRF works across possible Vercel proxy changes
-    CSRF_COOKIE_SAMESITE = 'None'
-    SESSION_COOKIE_SAMESITE = 'None'
+# Using default cookie settings to maximize compatibility
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -81,16 +75,13 @@ NEON_DB_URL = "postgresql://neondb_owner:npg_Kho0nTjGO2pc@ep-holy-smoke-b4mxtrxv
 DATABASES = {
     'default': dj_database_url.config(
         default=NEON_DB_URL,
-        conn_max_age=600,
+        conn_max_age=0, # Must be 0 for Vercel Serverless!
         conn_health_checks=True,
     )
 }
 
-if os.environ.get('VERCEL'):
-    MEDIA_ROOT = Path('/tmp/media')
-    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
-else:
-    MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path('/tmp/media')
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
