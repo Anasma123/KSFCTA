@@ -14,6 +14,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['.vercel.app', 'now.sh', '127.0.0.1', 'localhost', '*']
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://ksfcta.vercel.app',
     'https://*.vercel.app',
     'https://*.now.sh',
     'http://127.0.0.1:8000',
@@ -23,6 +24,14 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Enforce secure cookies in production (Vercel is HTTPS)
+if os.environ.get('VERCEL'):
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    # Ensure CSRF works across possible Vercel proxy changes
+    CSRF_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SAMESITE = 'None'
 
 INSTALLED_APPS = [
     'django.contrib.admin',

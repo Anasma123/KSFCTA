@@ -16,6 +16,9 @@ from .exports import (
 )
 
 
+from django.views.decorators.cache import never_cache
+
+@never_cache
 def home_view(request):
     """
     Public home page with online registration (including wings & ₹200 payment),
@@ -86,6 +89,7 @@ def registration_success_view(request, pk):
     return render(request, 'membership/success.html', {'app': app})
 
 
+@never_cache
 def login_view(request):
     """
     Direct login endpoint (accessible at /login/ or from the main page).
