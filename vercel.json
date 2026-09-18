@@ -8,7 +8,6 @@
         "maxLambdaSize": "15mb",
         "runtime": "python3.11",
         "includeFiles": [
-          "db.sqlite3",
           "membership/templates/**",
           "static/**",
           "staticfiles/**"
