@@ -223,4 +223,87 @@
   </div>
 
 </main>
+
+<script>
+  function compressImageFile(file, maxWidth, maxHeight, quality, callback) {
+    if (!file || !file.type.startsWith('image/')) {
+      callback(file);
+      return;
+    }
+    if (file.size <= 250 * 1024) {
+      callback(file);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(function(blob) {
+          if (blob && blob.size < file.size) {
+            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            callback(newFile, file.size, newFile.size);
+          } else {
+            callback(file);
+          }
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = function() { callback(file); };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const screenInput = document.getElementById('member_screenshot');
+  if (screenInput) {
+    const badge = document.createElement('div');
+    badge.style.fontSize = '0.78rem';
+    badge.style.marginTop = '6px';
+    badge.style.fontWeight = '600';
+    screenInput.parentNode.appendChild(badge);
+
+    screenInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) {
+        badge.innerHTML = '';
+        return;
+      }
+      badge.innerHTML = '<span style="color: #2563EB;">⏳ Optimizing receipt for fast upload...</span>';
+      compressImageFile(file, 1280, 1600, 0.80, function(compressedFile, origSize, newSize) {
+        if (compressedFile && newSize && newSize < origSize) {
+          try {
+            const dt = new DataTransfer();
+            dt.items.add(compressedFile);
+            screenInput.files = dt.files;
+          } catch(err) {}
+          const origMB = (origSize / (1024 * 1024)).toFixed(1);
+          const origStr = origSize > 1024 * 1024 ? `${origMB} MB` : `${Math.round(origSize / 1024)} KB`;
+          badge.innerHTML = `<span style="color: #059669;">✔ Auto-compressed: ${origStr} ➔ ${Math.round(newSize / 1024)} KB (Fast Upload Ready)</span>`;
+        } else {
+          badge.innerHTML = `<span style="color: #059669;">✔ Ready (${Math.round(file.size / 1024)} KB)</span>`;
+        }
+      });
+    });
+  }
+</script>
 {% endblock %}

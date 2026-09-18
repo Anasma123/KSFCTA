@@ -6,11 +6,21 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.11"
+        "runtime": "python3.11",
+        "includeFiles": [
+          "db.sqlite3",
+          "membership/templates/**",
+          "static/**",
+          "staticfiles/**"
+        ]
       }
     }
   ],
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "ksfcta_project/wsgi.py"
