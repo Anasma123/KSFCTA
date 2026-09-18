@@ -1230,6 +1230,221 @@ img {
 }
 
 /* ==========================================================================
+   Member Dashboard specific styles
+   ========================================================================== */
+.member-hero-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 36px;
+  margin-bottom: 32px;
+}
+
+.member-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.member-hero-profile {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.member-hero-img {
+  width: 80px;
+  height: 98px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 2px solid #93C5FD;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.member-hero-img-placeholder {
+  width: 80px;
+  height: 98px;
+  background: #F1F5F9;
+  border-radius: var(--radius-md);
+  border: 2px dashed #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: #94A3B8;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.member-hero-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-hero-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.wing-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary-blue);
+  background: #EFF6FF;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.ref-badge {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.id-badge {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #92400E;
+  background: #FEF3C7;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid #FCD34D;
+}
+
+.member-name {
+  font-size: 1.8rem;
+  color: var(--primary-navy);
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.member-designation {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.member-status-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.status-pill {
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.status-pill.approved { background: #D1FAE5; color: #047857; }
+.status-pill.rejected { background: #FEE2E2; color: #B91C1C; }
+.status-pill.pending { background: #FEF3C7; color: #B45309; }
+
+.payment-pill {
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  display: inline-flex;
+  text-align: center;
+}
+.payment-pill.verified { background: #EFF6FF; color: #1D4ED8; }
+.payment-pill.pending { background: #FEF3C7; color: #B45309; }
+
+.member-hero-footer {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+}
+
+.download-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.download-cta-text h4 {
+  font-size: 1.1rem;
+  color: var(--primary-navy);
+  margin-bottom: 2px;
+}
+.download-cta-text p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.download-cta-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, #0F2B5C 0%, #1A56DB 100%);
+  font-weight: 700;
+}
+
+.locked-cta-box {
+  background: #FEF9C3;
+  border: 1px solid #FDE047;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.locked-icon { font-size: 1.5rem; }
+.locked-title { font-weight: 700; color: #854D0E; font-size: 0.95rem; }
+.locked-text { font-size: 0.85rem; color: #92400E; margin-top: 2px; }
+
+.portal-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.portal-card-title {
+  font-size: 1.25rem;
+  color: var(--primary-navy);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.portal-card-title-sm {
+  font-size: 1.15rem;
+  color: var(--primary-navy);
+  margin-bottom: 16px;
+}
+
+.login-modal-box {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-xl);
+}
+
+/* ==========================================================================
    Responsive Breakpoints (Desktop, Tablet & Mobile)
    ========================================================================== */
 @media (max-width: 1024px) {
@@ -1759,6 +1974,84 @@ img {
     font-size: 0.68rem;
   }
 
+  /* Member Dashboard Mobile Fixes */
+  .member-hero-card {
+    padding: 20px 16px;
+  }
+  .member-hero-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .member-hero-profile {
+    flex-direction: row; /* Keep image side-by-side but allow wrapping of details */
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+  }
+  .member-hero-badges {
+    flex-direction: row;
+    gap: 6px;
+  }
+  .wing-badge {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    white-space: normal;
+    display: inline-block;
+  }
+  .ref-badge, .id-badge {
+    font-size: 0.78rem;
+    display: inline-block;
+  }
+  .member-name {
+    font-size: 1.35rem;
+    margin-bottom: 4px;
+  }
+  .member-designation {
+    font-size: 0.85rem;
+  }
+  .member-status-pills {
+    width: 100%;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .status-pill {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+  .payment-pill {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.80rem;
+    padding: 8px;
+  }
+  .download-cta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .download-cta-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+  .download-cta-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .portal-card {
+    padding: 20px 16px;
+  }
+  .locked-cta-box {
+    padding: 14px;
+    align-items: flex-start;
+  }
+  .locked-icon {
+    font-size: 1.25rem;
+    margin-top: 2px;
+  }
+
   /* Admin Nav on Phone */
   .admin-navbar {
     padding: 8px 0;
@@ -1775,5 +2068,9 @@ img {
     flex-wrap: wrap;
     gap: 6px;
     font-size: 0.76rem;
+  }
+
+  .login-modal-box {
+    padding: 28px 20px;
   }
 }

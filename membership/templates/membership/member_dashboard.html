@@ -40,89 +40,73 @@
   {% endif %}
 
   <!-- MEMBER STATUS HERO BANNER -->
-  <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: 36px; margin-bottom: 32px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-      <div style="display: flex; align-items: center; gap: 20px;">
+  <div class="member-hero-card">
+    <div class="member-hero-top">
+      <div class="member-hero-profile">
         {% if app.photo %}
-          <img src="{{ app.photo.url }}" alt="{{ app.full_name }}" style="width: 80px; height: 98px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid #93C5FD; box-shadow: var(--shadow-sm);" />
+          <img src="{{ app.photo.url }}" alt="{{ app.full_name }}" class="member-hero-img" />
         {% else %}
-          <div style="width: 80px; height: 98px; background: #F1F5F9; border-radius: var(--radius-md); border: 2px dashed #CBD5E1; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #94A3B8; text-align: center;">No Photo</div>
+          <div class="member-hero-img-placeholder">No Photo</div>
         {% endif %}
-        <div>
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary-blue); background: #EFF6FF; padding: 4px 12px; border-radius: var(--radius-full);">
-              {{ app.wing }} Wing
-            </span>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Ref: {{ app.application_no }}</span>
+        <div class="member-hero-info">
+          <div class="member-hero-badges">
+            <span class="wing-badge">{{ app.wing }} Wing</span>
+            <span class="ref-badge">Ref: {{ app.application_no }}</span>
             {% if app.membership_no %}
-              <span style="font-size: 0.85rem; font-weight: 800; color: #92400E; background: #FEF3C7; padding: 3px 10px; border-radius: var(--radius-full); border: 1px solid #FCD34D;">
-                ID: {{ app.membership_no }}
-              </span>
+              <span class="id-badge">ID: {{ app.membership_no }}</span>
             {% endif %}
           </div>
-          <h2 style="font-size: 1.8rem; color: var(--primary-navy); margin-bottom: 6px;">{{ app.full_name }}</h2>
-          <p style="font-size: 0.95rem; color: var(--text-muted);">{{ app.designation }} &bull; Dept of {{ app.department }} &bull; {{ app.institution }}</p>
+          <h2 class="member-name">{{ app.full_name }}</h2>
+          <p class="member-designation">{{ app.designation }} &bull; Dept of {{ app.department }} &bull; {{ app.institution }}</p>
         </div>
       </div>
 
       <!-- STATUS PILLS -->
-      <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
-        <div>
+      <div class="member-status-pills">
+        <div class="status-pill-wrap">
           {% if app.status == 'Approved' %}
-            <span style="background: #D1FAE5; color: #047857; font-weight: 800; padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px;">
-              ✓ Verified &amp; Accredited Member
-            </span>
+            <span class="status-pill approved">✓ Verified &amp; Accredited</span>
           {% elif app.status == 'Rejected' %}
-            <span style="background: #FEE2E2; color: #B91C1C; font-weight: 800; padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.92rem;">
-              ✕ Application Rejected
-            </span>
+            <span class="status-pill rejected">✕ Application Rejected</span>
           {% else %}
-            <span style="background: #FEF3C7; color: #B45309; font-weight: 800; padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.92rem;">
-              ⏳ Pending Verification
-            </span>
+            <span class="status-pill pending">⏳ Pending Verification</span>
           {% endif %}
         </div>
 
-        <div>
+        <div class="status-pill-wrap">
           {% if app.payment_status == 'Verified' %}
-            <span style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.82rem;">
-              💳 Fee: ₹ 200 (Payment Verified)
-            </span>
+            <span class="payment-pill verified">💳 Fee: ₹ 200 (Verified)</span>
           {% else %}
-            <span style="background: #FEF3C7; color: #B45309; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.82rem;">
-              💳 Fee: ₹ 200 (Payment Pending Verification)
-            </span>
+            <span class="payment-pill pending">💳 Fee: ₹ 200 (Pending)</span>
           {% endif %}
         </div>
       </div>
     </div>
 
     <!-- CERTIFICATE DOWNLOAD CTA -->
-    <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border-light);">
+    <div class="member-hero-footer">
       {% if app.status == 'Approved' %}
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-          <div>
-            <h4 style="font-size: 1.1rem; color: var(--primary-navy); margin-bottom: 2px;">Official Membership Certificate (Letterhead PDF)</h4>
-            <p style="font-size: 0.88rem; color: var(--text-muted);">
-              Generated on official KSFCTA letter pad with your passport photograph and Unique Membership ID.
-            </p>
+        <div class="download-cta-row">
+          <div class="download-cta-text">
+            <h4>Official Membership Certificate</h4>
+            <p>Generated on official KSFCTA letter pad with your photograph and ID.</p>
           </div>
-          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a href="{% url 'export_letterhead_pdf' app.id %}" class="btn btn-primary" style="background: linear-gradient(135deg, #0F2B5C 0%, #1A56DB 100%); padding: 12px 24px; font-weight: 700;">
-              📄 Download Official Letterhead Certificate (.pdf)
+          <div class="download-cta-buttons">
+            <a href="{% url 'export_letterhead_pdf' app.id %}" class="btn btn-primary primary-gradient">
+              📄 Download Certificate (.pdf)
             </a>
-            <a href="{% url 'export_single_docx' app.id %}" class="btn btn-outline" style="padding: 12px 20px;">
-              📘 Download Application (.docx)
+            <a href="{% url 'export_single_docx' app.id %}" class="btn btn-outline">
+              📘 Download App (.docx)
             </a>
           </div>
         </div>
       {% else %}
-        <div style="background: #FEF9C3; border: 1px solid #FDE047; border-radius: var(--radius-md); padding: 16px 20px; display: flex; align-items: center; gap: 12px;">
-          <span style="font-size: 1.5rem;">🔒</span>
+        <div class="locked-cta-box">
+          <span class="locked-icon">🔒</span>
           <div>
-            <div style="font-weight: 700; color: #854D0E; font-size: 0.95rem;">Certificate download is locked</div>
-            <div style="font-size: 0.85rem; color: #92400E; margin-top: 2px;">
-              Your Membership Certificate and documents will be available for download <strong>only after admin verification and approval</strong>.
+            <div class="locked-title">Certificate download is locked</div>
+            <div class="locked-text">
+              Your Membership Certificate will be available <strong>only after admin verification</strong>.
             </div>
           </div>
         </div>
@@ -142,8 +126,8 @@
   <div class="portal-grid-split">
     
     <!-- LEFT: Profile & Application details -->
-    <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 32px; box-shadow: var(--shadow-sm);">
-      <h3 style="font-size: 1.25rem; color: var(--primary-navy); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">
+    <div class="portal-card">
+      <h3 class="portal-card-title">
         Membership Profile
       </h3>
 
@@ -192,8 +176,8 @@
 
     <!-- RIGHT: Fee Payment & Proof Verification -->
     <div>
-      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 28px; box-shadow: var(--shadow-sm);">
-        <h3 style="font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 16px;">Membership Fee &amp; Payment (₹ 200)</h3>
+      <div class="portal-card">
+        <h3 class="portal-card-title-sm">Membership Fee &amp; Payment (₹ 200)</h3>
         
         <div style="text-align: center; margin-bottom: 18px;">
           <img src="{% static 'images/payment_qr.jpeg' %}" alt="Payment QR Code" style="width: 170px; height: 170px; object-fit: contain; margin: 0 auto 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 6px; background: #FFFFFF;" />
