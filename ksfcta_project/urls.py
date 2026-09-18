@@ -22,6 +22,31 @@ urlpatterns = [
     path('export/pdf-summary/', views.export_summary_pdf_view, name='export_summary_pdf'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+import os
+from django.urls import re_path
+from django.views.static import serve
+from django.http import Http404
+
+def serve_static_fallback(request, path):
+    # Check STATIC_ROOT first
+    target = os.path.join(settings.STATIC_ROOT, path)
+    if os.path.exists(target) and os.path.isfile(target):
+        response = serve(request, path, document_root=settings.STATIC_ROOT)
+        response['Cache-Control'] = 'public, max-age=86400'
+        return response
+    # Check each directory in STATICFILES_DIRS
+    for sdir in getattr(settings, 'STATICFILES_DIRS', []):
+        target = os.path.join(str(sdir), path)
+        if os.path.exists(target) and os.path.isfile(target):
+            response = serve(request, path, document_root=str(sdir))
+            response['Cache-Control'] = 'public, max-age=86400'
+            return response
+    raise Http404(f"Static file '{path}' not found")
+
+def serve_media_fallback(request, path):
+    return serve(request, path, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [
+    re_path(r'^static/(?P<path>.*)$', serve_static_fallback, name='static_fallback'),
+    re_path(r'^media/(?P<path>.*)$', serve_media_fallback, name='media_fallback'),
+]

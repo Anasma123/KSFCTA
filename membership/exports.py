@@ -27,8 +27,18 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
-LOGO_PATH = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
-LETTERHEAD_PATH = os.path.join(settings.BASE_DIR, 'static', 'templates', 'letterhead.pdf')
+def _find_asset_path(*relative_candidates):
+    for rel in relative_candidates:
+        for base in [settings.BASE_DIR, getattr(settings, 'STATIC_ROOT', None), *getattr(settings, 'STATICFILES_DIRS', [])]:
+            if not base:
+                continue
+            cand = os.path.join(str(base), rel)
+            if os.path.exists(cand):
+                return cand
+    return os.path.join(str(settings.BASE_DIR), relative_candidates[0])
+
+LOGO_PATH = _find_asset_path('images/logo.png', 'static/images/logo.png', 'logo.png')
+LETTERHEAD_PATH = _find_asset_path('templates/letterhead.pdf', 'static/templates/letterhead.pdf')
 
 
 def export_applications_to_excel(queryset):
@@ -337,6 +347,29 @@ def export_letterhead_certificate_pdf(app):
     # 1. Certificate Title Banner
     can.setFont('Helvetica-Bold', 15)
     can.setFillColor(colors.HexColor('#0F2B5C'))
+    # If standalone without letterhead PDF template, draw full header with exact logo
+    if not (os.path.exists(LETTERHEAD_PATH)):
+        if os.path.exists(LOGO_PATH):
+            try:
+                can.drawImage(LOGO_PATH, 55, 735, width=58, height=58, preserveAspectRatio=True, mask='auto')
+            except Exception:
+                pass
+        can.setFont('Helvetica-Bold', 12)
+        can.setFillColor(colors.HexColor('#0F2B5C'))
+        can.drawString(122, 770, "KERALA SELF FINANCING COLLEGE TEACHERS’ ASSOCIATION")
+        can.setFont('Helvetica-Bold', 8.5)
+        can.setFillColor(colors.HexColor('#DC2626'))
+        can.drawString(122, 756, "(Reg. No.: TVM/TC/425/2023)")
+        can.setFont('Helvetica', 8)
+        can.setFillColor(colors.HexColor('#475569'))
+        can.drawString(122, 744, "KSFCTA Mandir, Vanchiyoor, Thiruvananthapuram – 695035 | Helpline: 9995514415")
+        can.setStrokeColor(colors.HexColor('#0F2B5C'))
+        can.setLineWidth(1.5)
+        can.line(55, 728, 540, 728)
+        can.setStrokeColor(colors.HexColor('#16A34A'))
+        can.setLineWidth(1)
+        can.line(55, 724, 540, 724)
+
     can.drawCentredString(297.75, 660, "MEMBERSHIP ADMISSION CERTIFICATE")
 
     can.setFont('Helvetica-Bold', 9)
@@ -565,6 +598,14 @@ def export_summary_pdf(queryset):
     )
 
     story = []
+    if os.path.exists(LOGO_PATH):
+        try:
+            logo_img = RLImage(LOGO_PATH, width=42, height=42)
+            logo_img.hAlign = 'CENTER'
+            story.append(logo_img)
+            story.append(Spacer(1, 4))
+        except Exception:
+            pass
     story.append(Paragraph("<b>KERALA SELF FINANCING COLLEGE TEACHERS’ ASSOCIATION (KSFCTA)</b>", title_style))
     story.append(Paragraph(f"<font size=9>Membership Campaign 2026 — Master Summary Report (Total: {queryset.count()})</font>", title_style))
     story.append(Spacer(1, 8))
