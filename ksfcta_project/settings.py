@@ -75,30 +75,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ksfcta_project.wsgi.application'
 
+import dj_database_url
+
+NEON_DB_URL = "postgresql://neondb_owner:npg_Kho0nTjGO2pc@ep-holy-smoke-b4mxtrxv-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require"
+DATABASES = {
+    'default': dj_database_url.config(
+        default=NEON_DB_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
+
 if os.environ.get('VERCEL'):
-    import shutil
-    tmp_db = Path('/tmp/db.sqlite3')
-    original_db = BASE_DIR / 'db.sqlite3'
-    if not tmp_db.exists() and original_db.exists():
-        try:
-            shutil.copyfile(original_db, tmp_db)
-        except Exception:
-            pass
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': str(tmp_db),
-        }
-    }
     MEDIA_ROOT = Path('/tmp/media')
     MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
     MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_PASSWORD_VALIDATORS = [
