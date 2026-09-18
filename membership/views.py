@@ -498,23 +498,47 @@ def export_excel_view(request):
 
 @login_required(login_url='/login/')
 def export_single_docx_view(request, pk):
-    """Download official Microsoft Word (.docx) application."""
+    """Download official Microsoft Word (.docx) application. Only for admin or approved members."""
     app = get_object_or_404(MembershipApplication, pk=pk)
+    is_admin = request.user.is_staff or request.user.is_superuser
+    is_own_member = hasattr(request.user, 'application') and request.user.application.id == app.id
+
+    if is_admin:
+        return export_single_application_docx(app)
+
+    if not is_own_member:
+        messages.error(request, "Unauthorized access.")
+        return redirect('home')
+
+    if app.status != 'Approved':
+        messages.warning(request, "Your documents will be available for download only after admin verification and approval.")
+        return redirect('member_dashboard')
+
     return export_single_application_docx(app)
 
 
 def export_letterhead_pdf_view(request, pk):
     """
-    Download official Membership Certificate merged on the official letterhead:
-    brown and grey professional letterhead (4).pdf
-    Allowed for admin or the member themselves!
+    Download official Membership Certificate merged on the official letterhead.
+    Allowed for admin always. For members: ONLY if status is Approved.
     """
     app = get_object_or_404(MembershipApplication, pk=pk)
-    # Check authorization if logged in
-    if request.user.is_authenticated:
-        if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'application') and request.user.application.id == app.id)):
-            messages.error(request, "Unauthorized access.")
-            return redirect('home')
+    is_admin = request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser)
+    is_own_member = request.user.is_authenticated and hasattr(request.user, 'application') and request.user.application.id == app.id
+
+    if is_admin:
+        # Admin can always download
+        return export_letterhead_certificate_pdf(app)
+
+    if not is_own_member:
+        messages.error(request, "Unauthorized access.")
+        return redirect('home')
+
+    # Members can only download if approved
+    if app.status != 'Approved':
+        messages.warning(request, "Your certificate will be available for download only after admin verification and approval.")
+        return redirect('member_dashboard')
+
     return export_letterhead_certificate_pdf(app)
 
 
