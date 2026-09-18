@@ -10,8 +10,9 @@ class MembershipApplication(models.Model):
     ]
 
     CATEGORY_CHOICES = [
-        ('Teaching Staff', 'Teaching Staff'),
-        ('Non-Teaching Staff', 'Non-Teaching Staff'),
+        ('Principal', 'Principal'),
+        ('Teaching', 'Teaching'),
+        ('Non teaching', 'Non teaching'),
     ]
 
     WING_CHOICES = [
@@ -94,7 +95,7 @@ class MembershipApplication(models.Model):
     department = models.CharField(max_length=150, verbose_name="Department")
 
     # 9. Category
-    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default='Teaching Staff', verbose_name="Category")
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default='Teaching', verbose_name="Category")
 
     # 10. Address & Pin
     address = models.TextField(verbose_name="Permanent Address")

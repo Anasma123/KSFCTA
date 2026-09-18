@@ -273,11 +273,20 @@ def admin_portal_view(request):
 
 @login_required(login_url='/login/')
 def admin_quick_action_view(request, pk, action):
-    """Unified 1-Click Verification actions: accept (both payment & profile), reject (with reason)."""
+    """Unified 1-Click Verification actions: accept (both payment & profile), reject (with reason), and delete."""
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('member_dashboard')
 
     app = get_object_or_404(MembershipApplication, pk=pk)
+
+    if action == 'delete':
+        user_to_delete = app.user
+        app_name = app.full_name
+        app.delete()
+        if user_to_delete and not user_to_delete.is_superuser:
+            user_to_delete.delete()
+        messages.success(request, f"Application and account for {app_name} have been permanently deleted.")
+        return redirect('admin_portal')
 
     if action == 'accept':
         app.status = 'Approved'

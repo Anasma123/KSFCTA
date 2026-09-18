@@ -65,15 +65,22 @@
       </span>
     </div>
 
-    <div style="display: flex; gap: 8px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      {% if app.status != 'Approved' %}
       <a href="{% url 'admin_quick_action' app.id 'accept' %}" class="btn btn-success" style="padding: 8px 18px;">
         ✔ Accept &amp; Verify Now
       </a>
       <a href="{% url 'admin_quick_action' app.id 'reject' %}" class="btn btn-outline" style="color: #DC2626 !important; border-color: #FCA5A5; padding: 8px 18px;">
         ✕ Reject Application
       </a>
+      {% endif %}
+      {% if app.payment_status != 'Verified' %}
       <a href="{% url 'admin_quick_action' app.id 'verify_payment' %}" class="btn btn-outline" style="color: #1D4ED8 !important; border-color: #93C5FD; padding: 8px 18px;">
         💳 Mark Payment Verified
+      </a>
+      {% endif %}
+      <a href="{% url 'admin_quick_action' app.id 'delete' %}" class="btn btn-outline" style="color: #FFFFFF !important; background-color: #DC2626; border-color: #B91C1C; padding: 8px 18px;" onclick="return confirm('Are you sure you want to permanently delete this member and their account? This cannot be undone.');">
+        🗑️ Delete
       </a>
     </div>
   </div>

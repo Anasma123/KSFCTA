@@ -117,3 +117,6 @@ LOGIN_REDIRECT_URL = '/admin-portal/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Use cookie-based sessions to prevent logouts on Vercel's ephemeral filesystem
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
