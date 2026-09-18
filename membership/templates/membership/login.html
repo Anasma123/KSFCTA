@@ -1,18 +1,18 @@
 {% extends 'membership/base.html' %}
 {% load static %}
 
-{% block title %}Admin Portal Login | KSFCTA{% endblock %}
+{% block title %}Login | KSFCTA{% endblock %}
 
 {% block content %}
 <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 20%, rgba(26, 86, 219, 0.06) 0%, transparent 60%), #F8FAFC; padding: 24px;">
-  <div style="width: 100%; max-width: 440px; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 40px;">
+  <div class="login-modal-box">
     
     <div style="text-align: center; margin-bottom: 28px;">
       <a href="{% url 'home' %}" title="Back to Home">
         <img src="{% static 'images/logo.png' %}" alt="KSFCTA Logo" style="width: 68px; height: 68px; margin: 0 auto 14px; object-fit: contain;" />
       </a>
-      <h2 style="font-size: 1.4rem; color: var(--primary-navy); margin-bottom: 4px;">KSFCTA Admin Portal</h2>
-      <p style="font-size: 0.86rem; color: var(--text-muted);">Membership Campaign 2026 Management</p>
+      <h2 style="font-size: 1.5rem; color: var(--primary-navy); margin-bottom: 4px;">Login</h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted);">Sign in to access your account</p>
     </div>
 
     {% if error_msg %}
@@ -32,8 +32,8 @@
     <form method="post" action="{% url 'login' %}">
       {% csrf_token %}
       <div style="margin-bottom: 18px;">
-        <label class="field-label" for="username">Admin Username</label>
-        <input type="text" id="username" name="username" class="form-input" placeholder="Enter username" required autofocus autocomplete="username" />
+        <label class="field-label" for="username">Email Address or Username</label>
+        <input type="text" id="username" name="username" class="form-input" placeholder="Enter your email or username" required autofocus autocomplete="username" />
       </div>
 
       <div style="margin-bottom: 24px;">
@@ -41,14 +41,14 @@
         <input type="password" id="password" name="password" class="form-input" placeholder="••••••••••••" required autocomplete="current-password" />
       </div>
 
-      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
-        🔐 Sign In to Admin Portal
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 700;">
+        Sign In
       </button>
     </form>
 
     <div style="margin-top: 28px; text-align: center; border-top: 1px solid var(--border-light); padding-top: 18px;">
       <a href="{% url 'home' %}" style="font-size: 0.85rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px;">
-        ← Back to KSFCTA Campaign Page
+        ← Back to KSFCTA Home Page
       </a>
     </div>
 

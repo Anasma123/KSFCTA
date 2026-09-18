@@ -1,0 +1,226 @@
+{% extends 'membership/base.html' %}
+{% load static %}
+
+{% block title %}Member Dashboard | {{ app.full_name }} | KSFCTA{% endblock %}
+
+{% block content %}
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="{% url 'home' %}" class="brand-wrapper">
+      <img src="{% static 'images/logo.png' %}" alt="KSFCTA Logo" class="brand-logo" />
+      <div class="brand-text">
+        <h1>KERALA SELF FINANCING COLLEGE TEACHERS’ ASSOCIATION</h1>
+        <p>Member Portal &bull; Reg. No.: TVM/TC/425/2023</p>
+      </div>
+    </a>
+    <div class="header-cta">
+      <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-navy);">👤 {{ app.full_name }}</span>
+      <a href="{% url 'logout' %}" class="btn btn-outline" style="padding: 6px 16px; font-size: 0.85rem;">Logout</a>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding: 40px 24px 80px;">
+
+  <!-- REJECTION REASON ALERT (IF REJECTED) -->
+  {% if app.status == 'Rejected' %}
+  <div style="background: #FEF2F2; border: 1px solid #FCA5A5; border-left: 6px solid #DC2626; border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+    <div style="font-weight: 800; color: #991B1B; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+      <span>⚠️</span> Application Rejected by Admin
+    </div>
+    {% if app.rejection_reason %}
+      <div style="color: #7F1D1D; font-size: 0.95rem; line-height: 1.5; background: #FFFFFF; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #FECACA; margin-top: 8px;">
+        <strong>Reason for Rejection:</strong> {{ app.rejection_reason }}
+      </div>
+    {% endif %}
+    <p style="font-size: 0.85rem; color: #991B1B; margin-top: 10px; margin-bottom: 0;">
+      Please re-check your payment details below or contact the KSFCTA State Committee helpline: <strong>9995514415</strong>.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- MEMBER STATUS HERO BANNER -->
+  <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: 36px; margin-bottom: 32px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        {% if app.photo %}
+          <img src="{{ app.photo.url }}" alt="{{ app.full_name }}" style="width: 80px; height: 98px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid #93C5FD; box-shadow: var(--shadow-sm);" />
+        {% else %}
+          <div style="width: 80px; height: 98px; background: #F1F5F9; border-radius: var(--radius-md); border: 2px dashed #CBD5E1; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #94A3B8; text-align: center;">No Photo</div>
+        {% endif %}
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary-blue); background: #EFF6FF; padding: 4px 12px; border-radius: var(--radius-full);">
+              {{ app.wing }} Wing
+            </span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Ref: {{ app.application_no }}</span>
+            {% if app.membership_no %}
+              <span style="font-size: 0.85rem; font-weight: 800; color: #92400E; background: #FEF3C7; padding: 3px 10px; border-radius: var(--radius-full); border: 1px solid #FCD34D;">
+                ID: {{ app.membership_no }}
+              </span>
+            {% endif %}
+          </div>
+          <h2 style="font-size: 1.8rem; color: var(--primary-navy); margin-bottom: 6px;">{{ app.full_name }}</h2>
+          <p style="font-size: 0.95rem; color: var(--text-muted);">{{ app.designation }} &bull; Dept of {{ app.department }} &bull; {{ app.institution }}</p>
+        </div>
+      </div>
+
+      <!-- STATUS PILLS -->
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+        <div>
+          {% if app.status == 'Approved' %}
+            <span style="background: #D1FAE5; color: #047857; font-weight: 800; padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px;">
+              ✓ Verified &amp; Accredited Member
+            </span>
+          {% elif app.status == 'Rejected' %}
+            <span style="background: #FEE2E2; color: #B91C1C; font-weight: 800; padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.92rem;">
+              ✕ Application Rejected
+            </span>
+          {% else %}
+            <span style="background: #FEF3C7; color: #B45309; font-weight: 800; padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.92rem;">
+              ⏳ Pending Verification
+            </span>
+          {% endif %}
+        </div>
+
+        <div>
+          {% if app.payment_status == 'Verified' %}
+            <span style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.82rem;">
+              💳 Fee: ₹ 200 (Payment Verified)
+            </span>
+          {% else %}
+            <span style="background: #FEF3C7; color: #B45309; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.82rem;">
+              💳 Fee: ₹ 200 (Payment Pending Verification)
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- CERTIFICATE DOWNLOAD CTA -->
+    <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h4 style="font-size: 1.1rem; color: var(--primary-navy); margin-bottom: 2px;">Official Membership Certificate (Letterhead PDF)</h4>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Generated on official KSFCTA letter pad with your passport photograph and Unique Membership ID.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{% url 'export_letterhead_pdf' app.id %}" class="btn btn-primary" style="background: linear-gradient(135deg, #0F2B5C 0%, #1A56DB 100%); padding: 12px 24px; font-weight: 700;">
+          📄 Download Official Letterhead Certificate (.pdf)
+        </a>
+        <a href="{% url 'export_single_docx' app.id %}" class="btn btn-outline" style="padding: 12px 20px;">
+          📘 Download Application (.docx)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div style="background: #D1FAE5; border: 1px solid #A7F3D0; color: #065F46; padding: 14px 20px; border-radius: var(--radius-md); font-size: 0.92rem; margin-bottom: 24px;">
+      ✅ {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- 2-COLUMN DETAILS & PAYMENT SECTION -->
+  <div class="portal-grid-split">
+    
+    <!-- LEFT: Profile & Application details -->
+    <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 32px; box-shadow: var(--shadow-sm);">
+      <h3 style="font-size: 1.25rem; color: var(--primary-navy); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">
+        Membership Profile
+      </h3>
+
+      <div class="profile-grid-2" style="margin-bottom: 24px;">
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Designated Wing</span>
+          <div style="font-size: 1.05rem; font-weight: 700; color: var(--primary-blue);">{{ app.wing }}</div>
+        </div>
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Official Membership No.</span>
+          <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-dark);">{{ app.membership_no|default:"Will be assigned upon acceptance" }}</div>
+        </div>
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Mobile Number</span>
+          <div style="font-size: 0.95rem; color: var(--text-dark);">📞 {{ app.mobile }}</div>
+        </div>
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Login Email</span>
+          <div style="font-size: 0.95rem; color: var(--text-dark);">✉️ {{ app.email }}</div>
+        </div>
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Date of Birth</span>
+          <div style="font-size: 0.95rem; color: var(--text-dark);">📅 {{ app.dob|date:"d-m-Y" }}</div>
+        </div>
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Staff Category</span>
+          <div style="font-size: 0.95rem; color: var(--text-dark);">{{ app.category }}</div>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Permanent Residential Address</span>
+        <p style="font-size: 0.95rem; color: var(--text-dark); margin-top: 4px; white-space: pre-line;">{{ app.address }}</p>
+        <p style="font-size: 0.88rem; font-weight: 600; color: var(--primary-navy); margin-top: 6px;">
+          District: {{ app.district }} &bull; PIN: {{ app.pincode }}
+        </p>
+      </div>
+
+      <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: var(--radius-md); padding: 16px;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 4px;">Patronage &amp; Ideology</div>
+        <div style="font-size: 0.85rem; color: var(--text-body);">
+          Affiliated under the Patronage of KPCTA &amp; following the democratic, progressive ideology of the Indian National Congress.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Fee Payment & Proof Verification -->
+    <div>
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 28px; box-shadow: var(--shadow-sm);">
+        <h3 style="font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 16px;">Membership Fee &amp; Payment (₹ 200)</h3>
+        
+        <div style="text-align: center; margin-bottom: 18px;">
+          <img src="{% static 'images/payment_qr.jpeg' %}" alt="Payment QR Code" style="width: 170px; height: 170px; object-fit: contain; margin: 0 auto 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 6px; background: #FFFFFF;" />
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Scan QR to pay ₹ 200 via any UPI App</span>
+        </div>
+
+        <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 14px; font-size: 0.85rem; margin-bottom: 18px;">
+          <div><strong>Account Name:</strong> SHAFI K</div>
+          <div><strong>A/C No:</strong> 1704110010052111</div>
+          <div><strong>IFSC Code:</strong> UJVN0001704</div>
+          <div style="margin-top: 4px; color: var(--primary-blue); font-weight: 700;">Amount: ₹ 200</div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="update_payment" value="1" />
+          
+          <div style="margin-bottom: 14px;">
+            <label class="field-label" for="member_tx_id">Transaction ID / UTR Number</label>
+            <input type="text" name="transaction_id" id="member_tx_id" value="{{ app.transaction_id }}" class="form-input" placeholder="e.g. 234567890123" required />
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label class="field-label" for="member_screenshot">Upload Payment Receipt Screenshot</label>
+            <input type="file" name="payment_screenshot" id="member_screenshot" accept="image/*" class="form-file" />
+            {% if app.payment_screenshot %}
+              <div style="margin-top: 6px; font-size: 0.8rem; color: #059669;">
+                ✔ Current receipt uploaded. <a href="{{ app.payment_screenshot.url }}" target="_blank" style="text-decoration: underline;">View</a>
+              </div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 0.92rem;">
+            Submit Payment Proof
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+{% endblock %}

@@ -14,6 +14,7 @@
     </a>
     <div class="header-cta">
       <a href="#register" class="btn btn-primary">✍️ Register Online</a>
+      <button type="button" class="btn btn-outline" onclick="openLoginModal()" style="font-weight: 700;">🔐 Login</button>
     </div>
   </div>
 </header>
@@ -63,8 +64,8 @@
         </div>
 
         <div class="hero-actions">
-          <a href="#register" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.05rem;">✍️ JOIN NOW</a>
-          <a href="#why-join" class="btn btn-outline" style="padding: 14px 28px;">Why Join KSFCTA?</a>
+          <a href="#register" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.05rem;">✍️ JOIN NOW (FEE: ₹200)</a>
+          <button type="button" class="btn btn-outline" onclick="openLoginModal()" style="padding: 14px 28px;">🔐 Login</button>
         </div>
       </div>
 
@@ -185,8 +186,8 @@
           <div class="meta-value">2 October 2026 to 14 November 2026</div>
         </div>
         <div class="campaign-meta-item">
-          <div class="meta-label">Eligibility</div>
-          <div class="meta-value">Teachers working in self-financing colleges in Kerala</div>
+          <div class="meta-label">Eligibility &amp; Membership Fee</div>
+          <div class="meta-value">Self-Financing College Teachers &bull; Fee: ₹ 200</div>
         </div>
       </div>
     </div>
@@ -197,7 +198,7 @@
         <img src="{% static 'images/logo.png' %}" alt="KSFCTA Logo" class="form-header-logo" />
         <div class="form-header-text">
           <h3>READY TO JOIN?</h3>
-          <p>Register your membership online today. Please fill in all details as required in the official membership form.</p>
+          <p>Register your membership online today. Please complete all required details, select your wing, and submit payment verification (₹ 200).</p>
         </div>
       </div>
 
@@ -207,7 +208,7 @@
         <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.9rem;">
           {% for field, errors in form.errors.items %}
             {% for error in errors %}
-              <li>{{ error }}</li>
+              <li><strong>{{ field|title }}:</strong> {{ error }}</li>
             {% endfor %}
           {% endfor %}
         </ul>
@@ -217,11 +218,11 @@
       <form method="post" enctype="multipart/form-data" id="membership-form">
         {% csrf_token %}
 
-        <!-- Block 1: Personal Details -->
+        <!-- Block 1: Personal & Login Credentials -->
         <div class="form-group-block">
           <div class="group-title">
             <span class="group-badge">1</span>
-            <span>Personal Information</span>
+            <span>Personal Information &amp; Login Setup</span>
           </div>
 
           <div class="field-wrapper">
@@ -245,16 +246,41 @@
           </div>
 
           <div class="field-wrapper">
-            <label class="field-label" for="id_email">5. Email ID<span class="req">*</span></label>
+            <label class="field-label" for="id_email">5. Email ID (Used as Login Username)<span class="req">*</span></label>
             {{ form.email }}
+          </div>
+
+          <!-- Account Password Fields for Member Portal -->
+          <div class="form-grid-2" style="background: #EFF6FF; padding: 16px; border-radius: var(--radius-md); border: 1px solid #BFDBFE;">
+            <div class="field-wrapper" style="margin-bottom: 0;">
+              <label class="field-label" for="id_password">Create Account Password<span class="req">*</span></label>
+              {{ form.password }}
+              <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">Min 6 characters. Use to log in to member portal.</div>
+            </div>
+            <div class="field-wrapper" style="margin-bottom: 0;">
+              <label class="field-label" for="id_confirm_password">Confirm Password<span class="req">*</span></label>
+              {{ form.confirm_password }}
+            </div>
           </div>
         </div>
 
-        <!-- Block 2: Professional & Institutional Details -->
+        <!-- Block 2: Wings & Institutional Details -->
         <div class="form-group-block">
           <div class="group-title">
             <span class="group-badge">2</span>
-            <span>College &amp; Professional Details</span>
+            <span>Designated Wing &amp; Institutional Details</span>
+          </div>
+
+          <div class="field-wrapper">
+            <label class="field-label" for="id_wing">Select Your Wing<span class="req">*</span></label>
+            {{ form.wing }}
+          </div>
+
+          <div class="field-wrapper" id="other-wing-field" style="display: none;">
+            <label class="field-label" for="id_other_wing">
+              Please Specify Your Wing / Faculty<span class="req">*</span>
+            </label>
+            {{ form.other_wing }}
           </div>
 
           <div class="field-wrapper">
@@ -282,7 +308,7 @@
         <div class="form-group-block">
           <div class="group-title">
             <span class="group-badge">3</span>
-            <span>Permanent Address &amp; Membership Type</span>
+            <span>Permanent Address &amp; Membership Details</span>
           </div>
 
           <div class="field-wrapper">
@@ -307,8 +333,60 @@
               {{ form.membership_type }}
             </div>
             <div class="field-wrapper">
-              <label class="field-label" for="id_photo">Passport Photo (Optional)</label>
+              <label class="field-label" for="id_photo">12. Passport Photo (Mandatory for Membership Card)<span class="req">*</span></label>
               {{ form.photo }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 4: Payment Section (Fee: ₹ 200) -->
+        <div class="form-group-block">
+          <div class="group-title">
+            <span class="group-badge">4</span>
+            <span>Membership Fee Payment (₹ 200)</span>
+          </div>
+
+          <div class="payment-box-wrapper">
+            <div class="payment-layout-grid">
+              
+              <!-- LARGE HIGH-RESOLUTION QR CODE FOR EASY SCANNING -->
+              <div class="payment-qr-card">
+                <img src="{% static 'images/payment_qr.jpeg' %}" alt="Payment QR Code" />
+                <div style="font-size: 0.86rem; font-weight: 800; color: #0F2B5C;">📱 Scan QR Code to Pay ₹ 200</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM</div>
+              </div>
+
+              <!-- Bank details & instructions -->
+              <div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
+                  Official Membership Fee: <span style="color: #059669;">₹ 200</span>
+                </div>
+                <div class="payment-bank-details">
+                  <div><strong>Account Holder Name:</strong> <span style="color: var(--primary-blue); font-weight: 800;">SHAFI K</span></div>
+                  <div><strong>Bank Account Number:</strong> <span style="font-weight: 800; font-family: monospace; font-size: 1.05rem;">1704110010052111</span></div>
+                  <div><strong>IFSC Code:</strong> <span style="font-weight: 800; font-family: monospace; font-size: 1.05rem;">UJVN0001704</span></div>
+                </div>
+                <p style="font-size: 0.84rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
+                  Scan the QR code above or transfer directly to the bank account. After payment, enter your <strong>Transaction ID / UTR Number</strong> below (mandatory) and upload the receipt screenshot.
+                </p>
+              </div>
+            </div>
+
+            <div class="form-grid-2" style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-light);">
+              <div class="field-wrapper" style="margin-bottom: 0;">
+                <label class="field-label" for="id_transaction_id" style="font-weight: 800; color: #0F2B5C;">
+                  Transaction ID / UTR Number<span class="req">*</span>
+                </label>
+                {{ form.transaction_id }}
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">Mandatory field. Enter the 12-digit UTR or Transaction ID from your payment app.</div>
+              </div>
+              <div class="field-wrapper" style="margin-bottom: 0;">
+                <label class="field-label" for="id_payment_screenshot" style="font-weight: 800; color: #0F2B5C;">
+                  Upload Payment Receipt Screenshot<span class="req">*</span>
+                </label>
+                {{ form.payment_screenshot }}
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">Mandatory field. Attach screenshot of payment confirmation from UPI app.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -326,7 +404,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary btn-submit-large">
-          ✍️ JOIN NOW – SUBMIT MEMBERSHIP APPLICATION
+          ✍️ JOIN NOW – SUBMIT REGISTRATION &amp; PAYMENT
         </button>
       </form>
     </div>
@@ -377,14 +455,6 @@
             <p><strong>9995514415</strong></p>
           </div>
         </div>
-
-        <div class="contact-item">
-          <div class="contact-icon">✉️</div>
-          <div>
-            <h5>Email Correspondence</h5>
-            <p>ksfcta@gmail.com, info.ksfcta@gmail.com</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -401,8 +471,9 @@
           <p>Reg. No.: TVM/TC/425/2023 | KSFCTA Mandir, Vanchiyoor, Thiruvananthapuram – 695035</p>
         </div>
       </div>
-      <div>
+      <div style="display: flex; gap: 12px;">
         <a href="#register" class="btn btn-outline" style="color: #FFFFFF !important; border-color: rgba(255,255,255,0.3);">Register Online</a>
+        <button type="button" class="btn btn-outline" onclick="openLoginModal()" style="color: #FFFFFF !important; border-color: rgba(255,255,255,0.3);">Login</button>
       </div>
     </div>
     <div class="footer-bottom">
@@ -411,6 +482,45 @@
     </div>
   </div>
 </footer>
+
+<!-- DIRECT ON-PAGE COMMON LOGIN MODAL -->
+<div id="login-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
+  <div class="login-modal-box">
+    <button type="button" onclick="closeLoginModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+    
+    <div style="text-align: center; margin-bottom: 24px;">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" style="width: 56px; height: 56px; object-fit: contain; margin: 0 auto 10px;" />
+      <h3 style="font-size: 1.4rem; color: var(--primary-navy);">Login</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Sign in to access your account</p>
+    </div>
+
+    {% if login_error %}
+    <div style="background: #FEE2E2; border: 1px solid #FCA5A5; color: #B91C1C; padding: 10px 14px; border-radius: var(--radius-md); font-size: 0.84rem; margin-bottom: 16px;">
+      ⚠️ {{ login_error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'home' %}">
+      {% csrf_token %}
+      <input type="hidden" name="action_login" value="1" />
+
+      <div style="margin-bottom: 16px;">
+        <label class="field-label" for="modal_user">Email Address or Username</label>
+        <input type="text" name="username_or_email" id="modal_user" class="form-input" placeholder="Enter your email or username" required />
+      </div>
+
+      <div style="margin-bottom: 22px;">
+        <label class="field-label" for="modal_pwd">Password</label>
+        <input type="password" name="password" id="modal_pwd" class="form-input" placeholder="••••••••••••" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 700; font-size: 1rem;">
+        Sign In
+      </button>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -445,5 +555,39 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
   })();
+
+  function handleWingChange(selectEl) {
+    const otherField = document.getElementById('other-wing-field');
+    const otherInput = document.getElementById('id_other_wing');
+    if (selectEl && selectEl.value === 'Other') {
+      otherField.style.display = 'block';
+      if (otherInput) otherInput.required = true;
+    } else if (otherField) {
+      otherField.style.display = 'none';
+      if (otherInput) otherInput.required = false;
+    }
+  }
+
+  // Check initial state on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const wingSelect = document.getElementById('id_wing');
+    if (wingSelect) {
+      handleWingChange(wingSelect);
+    }
+  });
+
+  function openLoginModal() {
+    const modal = document.getElementById('login-modal');
+    modal.style.display = 'flex';
+  }
+
+  function closeLoginModal() {
+    const modal = document.getElementById('login-modal');
+    modal.style.display = 'none';
+  }
+
+  {% if login_error %}
+    openLoginModal();
+  {% endif %}
 </script>
 {% endblock %}

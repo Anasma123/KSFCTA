@@ -1,7 +1,7 @@
 {% extends 'membership/base.html' %}
 {% load static %}
 
-{% block title %}Admin Dashboard | KSFCTA Membership Campaign 2026{% endblock %}
+{% block title %}Wing Register: {{ selected_wing }} | KSFCTA Admin{% endblock %}
 
 {% block content %}
 <!-- ADMIN NAV -->
@@ -13,6 +13,12 @@
     </a>
     <div class="admin-nav-user">
       <span>👤 Admin: <strong>{{ request.user.username }}</strong></span>
+      <a href="{% url 'admin_portal' %}" class="btn btn-outline" style="color: #FFFFFF !important; border-color: rgba(255,255,255,0.3); padding: 6px 14px; font-size: 0.8rem;">
+        📋 Master Register
+      </a>
+      <a href="{% url 'admin_districts' %}" class="btn btn-outline" style="color: #FFFFFF !important; border-color: rgba(255,255,255,0.3); padding: 6px 14px; font-size: 0.8rem;">
+        📍 Districts (14)
+      </a>
       <a href="{% url 'home' %}" target="_blank" class="btn btn-outline" style="color: #FFFFFF !important; border-color: rgba(255,255,255,0.3); padding: 6px 14px; font-size: 0.8rem;">
         🌐 Public Site
       </a>
@@ -25,18 +31,22 @@
 
 <main class="container" style="padding-top: 32px; padding-bottom: 60px;">
 
-  <!-- PAGE HEADER & BULK EXPORT BUTTONS -->
+  <!-- PAGE HEADER & DEDICATED WING DOWNLOAD BUTTONS -->
   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
     <div>
-      <h2 style="font-size: 1.8rem; color: var(--primary-navy);">Verification &amp; Membership Master Register</h2>
-      <p style="font-size: 0.92rem; color: var(--text-muted);">Manage applications, verify ₹200 fee payments, accept/reject, and issue letterhead certificates.</p>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+        <span class="badge" style="background: #DBEAFE; color: #1E40AF; font-size: 0.82rem; font-weight: 700; padding: 4px 10px;">Academic Wing Section</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Dedicated Wing Register</span>
+      </div>
+      <h2 style="font-size: 1.8rem; color: var(--primary-navy); margin: 0;">{{ selected_wing }}</h2>
+      <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 4px;">Explore, filter, verify, and download comprehensive member records specific to this wing.</p>
     </div>
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="{% url 'export_excel' %}?q={{ current_q }}&wing={{ current_wing }}&district={{ current_district }}&status={{ current_status }}&payment_status={{ current_payment }}&sort={{ current_sort }}" class="btn btn-success" title="Download filtered & sorted spreadsheet">
-        📗 Download Excel (.xlsx)
+      <a href="{% url 'export_excel' %}?wing={{ selected_wing }}&q={{ current_q }}&sort={{ current_sort }}" class="btn btn-success" title="Download Excel (.xlsx) containing all data for {{ selected_wing }}">
+        📗 Download {{ selected_wing|truncatechars:18 }} Excel
       </a>
-      <a href="{% url 'export_summary_pdf' %}?q={{ current_q }}&wing={{ current_wing }}&district={{ current_district }}&status={{ current_status }}&payment_status={{ current_payment }}&sort={{ current_sort }}" class="btn btn-outline" style="background: #FFFFFF; border-color: #CBD5E1;" title="Download filtered & sorted PDF summary">
-        📕 Download PDF Summary
+      <a href="{% url 'export_summary_pdf' %}?wing={{ selected_wing }}&q={{ current_q }}&sort={{ current_sort }}" class="btn btn-outline" style="background: #FFFFFF; border-color: #CBD5E1;" title="Download PDF summary for {{ selected_wing }}">
+        📕 Download Wing PDF Summary
       </a>
     </div>
   </div>
@@ -49,106 +59,58 @@
     {% endfor %}
   {% endif %}
 
-  <!-- TOP CATEGORIZED NAVIGATION TABS -->
-  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); padding-bottom: 12px;">
-    <a href="{% url 'admin_portal' %}?tab=all" class="btn {% if current_tab == 'all' or not current_tab %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 8px 16px; font-size: 0.88rem;">
-      📋 All Applications ({{ total_count }})
-    </a>
-    <a href="{% url 'admin_portal' %}?tab=unverified" class="btn {% if current_tab == 'unverified' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 8px 16px; font-size: 0.88rem; {% if current_tab != 'unverified' %}color: #D97706 !important; border-color: #FDE68A;{% endif %}">
-      ⏳ Unverified / Pending ({{ pending_count }})
-    </a>
-    <a href="{% url 'admin_portal' %}?tab=verified" class="btn {% if current_tab == 'verified' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 8px 16px; font-size: 0.88rem; {% if current_tab != 'verified' %}color: #059669 !important; border-color: #A7F3D0;{% endif %}">
-      ✔ Verified Members ({{ approved_count }})
-    </a>
-    <a href="{% url 'admin_portal' %}?tab=rejected" class="btn {% if current_tab == 'rejected' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 8px 16px; font-size: 0.88rem; {% if current_tab != 'rejected' %}color: #DC2626 !important; border-color: #FCA5A5;{% endif %}">
-      ✕ Rejected ({{ rejected_count }})
-    </a>
-    <a href="{% url 'admin_wings' %}" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.88rem; background: #EFF6FF; border-color: #93C5FD; color: #1D4ED8 !important;">
-      🎓 Explore Wings (8)
-    </a>
-    <a href="{% url 'admin_districts' %}" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.88rem; background: #F5F3FF; border-color: #C4B5FD; color: #6D28D9 !important;">
-      📍 Explore Districts (14)
-    </a>
+  <!-- 8 ACADEMIC WINGS SELECTION TABS -->
+  <div style="margin-bottom: 24px;">
+    <div style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">
+      Select Academic Wing:
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 2px solid var(--border-light); padding-bottom: 12px;">
+      {% for w in wings_list %}
+      <a href="{% url 'admin_wings' %}?wing={{ w }}" 
+         class="btn {% if selected_wing == w %}btn-primary{% else %}btn-outline{% endif %}" 
+         style="padding: 7px 14px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+        <span>{{ w }}</span>
+        {% for kw, count in wing_counts.items %}
+          {% if kw == w %}
+            <span class="badge" style="{% if selected_wing == w %}background: rgba(255,255,255,0.25); color: #FFFFFF;{% else %}background: #E2E8F0; color: #334155;{% endif %} font-size: 0.72rem; padding: 1px 6px;">
+              {{ count }}
+            </span>
+          {% endif %}
+        {% endfor %}
+      </a>
+      {% endfor %}
+    </div>
   </div>
 
-  <!-- KPI / REGISTRATION COUNT CARDS -->
+  <!-- KPI CARDS FOR SELECTED WING -->
   <div class="stats-grid-portal">
     <div class="stat-metric-card primary">
-      <div class="label">Total Applications</div>
-      <div class="number">{{ total_count }}</div>
+      <div class="label">Total in {{ selected_wing|truncatechars:18 }}</div>
+      <div class="number">{{ wing_total }}</div>
     </div>
     <div class="stat-metric-card success">
       <div class="label">Approved &amp; Verified</div>
-      <div class="number">{{ approved_count }}</div>
+      <div class="number">{{ wing_approved }}</div>
     </div>
     <div class="stat-metric-card warning">
       <div class="label">Pending Verification</div>
-      <div class="number">{{ pending_count }}</div>
-    </div>
-    <div class="stat-metric-card success">
-      <div class="label">Payments Verified</div>
-      <div class="number">{{ payment_verified_count }}</div>
-    </div>
-    <div class="stat-metric-card warning">
-      <div class="label">Payments Pending</div>
-      <div class="number">{{ payment_pending_count }}</div>
+      <div class="number">{{ wing_pending }}</div>
     </div>
     <div class="stat-metric-card primary">
       <div class="label">Total Rejected</div>
-      <div class="number">{{ rejected_count }}</div>
+      <div class="number">{{ wing_rejected }}</div>
     </div>
   </div>
 
-  <!-- TOOLBAR: SEARCH, SORT & FILTERS -->
+  <!-- TOOLBAR: SEARCH & SORT WITHIN SELECTED WING -->
   <div class="toolbar-card">
-    <form method="get" action="{% url 'admin_portal' %}">
-      {% if current_tab %}
-        <input type="hidden" name="tab" value="{{ current_tab }}" />
-      {% endif %}
-      <div class="toolbar-grid">
+    <form method="get" action="{% url 'admin_wings' %}">
+      <input type="hidden" name="wing" value="{{ selected_wing }}" />
+      <div class="toolbar-grid" style="grid-template-columns: 2fr 1fr auto;">
         
         <!-- Search Input -->
         <div>
-          <input type="text" name="q" value="{{ current_q }}" class="form-input" placeholder="🔍 Search name, college, UTR, app no..." />
-        </div>
-
-        <!-- Wing Filter -->
-        <div>
-          <select name="wing" class="form-select">
-            <option value="">All Wings</option>
-            {% for w in wings %}
-              <option value="{{ w }}" {% if current_wing == w %}selected{% endif %}>{{ w }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- District Filter -->
-        <div>
-          <select name="district" class="form-select">
-            <option value="">All Districts</option>
-            {% for d in districts %}
-              <option value="{{ d }}" {% if current_district == d %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- Status Filter -->
-        <div>
-          <select name="status" class="form-select">
-            <option value="">All Application Status</option>
-            <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
-            <option value="Approved" {% if current_status == 'Approved' %}selected{% endif %}>Approved / Accepted</option>
-            <option value="Rejected" {% if current_status == 'Rejected' %}selected{% endif %}>Rejected</option>
-          </select>
-        </div>
-
-        <!-- Payment Status Filter -->
-        <div>
-          <select name="payment_status" class="form-select">
-            <option value="">All Payments</option>
-            <option value="Pending Verification" {% if current_payment == 'Pending Verification' %}selected{% endif %}>Pending Verification</option>
-            <option value="Verified" {% if current_payment == 'Verified' %}selected{% endif %}>Payment Verified</option>
-          </select>
+          <input type="text" name="q" value="{{ current_q }}" class="form-input" placeholder="🔍 Search name, college, district, UTR in this wing..." />
         </div>
 
         <!-- Sorting -->
@@ -156,19 +118,18 @@
           <select name="sort" class="form-select">
             <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Sort: Newest First</option>
             <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
-            <option value="wing_asc" {% if current_sort == 'wing_asc' %}selected{% endif %}>Sort: Wing (A to Z)</option>
-            <option value="wing_desc" {% if current_sort == 'wing_desc' %}selected{% endif %}>Sort: Wing (Z to A)</option>
             <option value="name_asc" {% if current_sort == 'name_asc' %}selected{% endif %}>Sort: Name (A to Z)</option>
             <option value="name_desc" {% if current_sort == 'name_desc' %}selected{% endif %}>Sort: Name (Z to A)</option>
             <option value="district_asc" {% if current_sort == 'district_asc' %}selected{% endif %}>Sort: District</option>
+            <option value="institution_asc" {% if current_sort == 'institution_asc' %}selected{% endif %}>Sort: Institution</option>
           </select>
         </div>
 
         <!-- Submit & Reset Buttons -->
         <div style="display: flex; gap: 6px;">
-          <button type="submit" class="btn btn-primary" style="padding: 10px 18px;">Apply</button>
-          {% if current_q or current_district or current_wing or current_status or current_payment or current_sort != 'newest' or current_tab != 'all' %}
-          <a href="{% url 'admin_portal' %}" class="btn btn-outline" style="padding: 10px 14px;" title="Reset filters">Reset</a>
+          <button type="submit" class="btn btn-primary" style="padding: 10px 18px;">Filter</button>
+          {% if current_q or current_sort != 'newest' %}
+          <a href="{% url 'admin_wings' %}?wing={{ selected_wing }}" class="btn btn-outline" style="padding: 10px 14px;" title="Reset filters">Reset</a>
           {% endif %}
         </div>
 
@@ -178,44 +139,30 @@
 
   <!-- TABLE RESULTS -->
   <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: var(--text-muted);">
-    <span>Showing <strong>{{ filtered_count }}</strong> record{{ filtered_count|pluralize }}</span>
-    {% if current_q or current_district or current_wing or current_status or current_payment or current_sort == 'wing_asc' or current_sort == 'wing_desc' %}
-    <span style="color: var(--primary-blue); font-weight: 600;">
-      {% if current_sort == 'wing_asc' %}Sorted by Wing (A to Z) &bull; {% elif current_sort == 'wing_desc' %}Sorted by Wing (Z to A) &bull; {% endif %}Active filters applied
-    </span>
-    {% endif %}
+    <span>Showing <strong>{{ filtered_count }}</strong> registered teacher{{ filtered_count|pluralize }} in <strong>{{ selected_wing }}</strong></span>
+    <span style="color: var(--primary-blue); font-weight: 600;">Counting Numbers 1 to {{ filtered_count }}</span>
   </div>
 
-  <div class="mobile-table-hint">👉 Swipe table horizontally to view full details, Photo, Wing, and actions</div>
+  <div class="mobile-table-hint">👉 Swipe table horizontally to view full details, Photo, and actions</div>
   <div class="table-responsive">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Sl</th>
+          <th>Sl No</th>
           <th>Photo</th>
           <th>App No / Member ID</th>
-          <th>Applicant</th>
-          <th style="min-width: 170px;">
-            <a href="{% url 'admin_portal' %}?q={{ current_q }}&wing={{ current_wing }}&district={{ current_district }}&status={{ current_status }}&payment_status={{ current_payment }}&sort={% if current_sort == 'wing_asc' %}wing_desc{% else %}wing_asc{% endif %}" 
-               style="display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; font-weight: 700;" 
-               title="Click to sort by Wing (A-Z / Z-A)">
-              <span>Select Your Wing</span>
-              <span style="font-size: 0.95rem; color: {% if current_sort == 'wing_asc' or current_sort == 'wing_desc' %}#2563EB{% else %}#94A3B8{% endif %}; font-weight: 800;">
-                {% if current_sort == 'wing_asc' %}▲ (A-Z){% elif current_sort == 'wing_desc' %}▼ (Z-A){% else %}⇅{% endif %}
-              </span>
-            </a>
-          </th>
+          <th>Applicant Name</th>
           <th>Designation &amp; College</th>
           <th>District</th>
           <th>Payment (₹200)</th>
-          <th>Verification</th>
+          <th>Verification Status</th>
           <th style="text-align: right;">1-Step Action &amp; Certificate</th>
         </tr>
       </thead>
       <tbody>
         {% for app in applications %}
         <tr>
-          <td>{{ forloop.counter }}</td>
+          <td><strong>{{ forloop.counter }}</strong></td>
           <td>
             {% if app.photo %}
               <img src="{{ app.photo.url }}" alt="{{ app.full_name }}" style="width: 44px; height: 52px; object-fit: cover; border-radius: 4px; border: 1px solid #CBD5E1; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />
@@ -236,18 +183,8 @@
           <td>
             <strong>{{ app.full_name }}</strong>
             <div style="font-size: 0.74rem; color: var(--text-muted);">✉️ {{ app.email }} &bull; 📞 {{ app.mobile }}</div>
-          </td>
-          <td>
-            {% if app.wing == 'Other' %}
-              <div style="font-weight: 700; color: #6D28D9; font-size: 0.88rem;">
-                <span class="badge" style="background: #F3E8FF; color: #6D28D9; font-size: 0.72rem; padding: 2px 7px; margin-right: 4px;">Other</span>
-                <span>{{ app.other_wing|default:"Other" }}</span>
-              </div>
-            {% else %}
-              <div style="font-weight: 700; color: #1E40AF; font-size: 0.88rem;">
-                <span class="badge" style="background: #DBEAFE; color: #1E40AF; font-size: 0.72rem; padding: 2px 7px; margin-right: 4px;">Wing</span>
-                <span>{{ app.wing }}</span>
-              </div>
+            {% if app.other_wing and app.wing == 'Other' %}
+              <div style="font-size: 0.72rem; color: #6D28D9; font-style: italic;">Spec: {{ app.other_wing }}</div>
             {% endif %}
           </td>
           <td>
@@ -258,6 +195,7 @@
           </td>
           <td>
             <span style="font-weight: 600;">{{ app.district }}</span>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">PIN: {{ app.pincode }}</div>
           </td>
           <td>
             <div><strong>{{ app.membership_fee }}</strong></div>
@@ -318,8 +256,8 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="10" style="text-align: center; padding: 48px; color: var(--text-muted);">
-            No records match the current search or filter criteria.
+          <td colspan="9" style="text-align: center; padding: 48px; color: var(--text-muted);">
+            No records found for the wing <strong>{{ selected_wing }}</strong>.
           </td>
         </tr>
         {% endfor %}
@@ -374,7 +312,6 @@ function closeRejectModal() {
   modal.style.display = 'none';
 }
 
-// Close modal when clicking outside
 window.addEventListener('click', function(e) {
   var modal = document.getElementById('rejectModal');
   if (e.target === modal) {

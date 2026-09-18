@@ -1,7 +1,66 @@
 from django import forms
+from django.contrib.auth.models import User
 from .models import MembershipApplication
 
 class MembershipRegistrationForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Create a password for your account',
+            'required': True,
+            'id': 'id_password'
+        }),
+        label="Create Account Password",
+        min_length=6,
+        help_text="Minimum 6 characters. You will use your Email and this Password to log in."
+    )
+
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Confirm your password',
+            'required': True,
+            'id': 'id_confirm_password'
+        }),
+        label="Confirm Account Password"
+    )
+
+    transaction_id = forms.CharField(
+        required=True,
+        error_messages={'required': 'Transaction ID / UTR Number is required to verify your payment.'},
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Enter 12-digit UPI / UTR / Transaction ID (Mandatory)',
+            'required': True,
+            'id': 'id_transaction_id'
+        }),
+        label="Transaction ID / UTR Number"
+    )
+
+    photo = forms.ImageField(
+        required=True,
+        error_messages={'required': 'Passport-size photo is mandatory for your membership card / certificate.'},
+        widget=forms.FileInput(attrs={
+            'class': 'form-file',
+            'accept': 'image/*',
+            'required': True,
+            'id': 'id_photo'
+        }),
+        label="Passport Size Photograph (Mandatory for Membership Card)"
+    )
+
+    payment_screenshot = forms.ImageField(
+        required=True,
+        error_messages={'required': 'Payment receipt screenshot is required to verify your payment.'},
+        widget=forms.FileInput(attrs={
+            'class': 'form-file',
+            'accept': 'image/*',
+            'required': True,
+            'id': 'id_payment_screenshot'
+        }),
+        label="Upload Payment Receipt Screenshot"
+    )
+
     declaration = forms.BooleanField(
         required=True,
         error_messages={'required': 'You must agree to the declaration to complete registration.'},
@@ -16,6 +75,8 @@ class MembershipRegistrationForm(forms.ModelForm):
             'dob',
             'mobile',
             'email',
+            'wing',
+            'other_wing',
             'institution',
             'designation',
             'department',
@@ -25,6 +86,8 @@ class MembershipRegistrationForm(forms.ModelForm):
             'district',
             'membership_type',
             'photo',
+            'transaction_id',
+            'payment_screenshot',
             'declaration',
         ]
         widgets = {
@@ -56,9 +119,20 @@ class MembershipRegistrationForm(forms.ModelForm):
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-input',
-                'placeholder': 'name@example.com',
+                'placeholder': 'name@example.com (Your Login Username)',
                 'required': True,
                 'id': 'id_email'
+            }),
+            'wing': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'id': 'id_wing',
+                'onchange': 'handleWingChange(this)'
+            }),
+            'other_wing': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Please specify your Wing name',
+                'id': 'id_other_wing'
             }),
             'institution': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -68,13 +142,13 @@ class MembershipRegistrationForm(forms.ModelForm):
             }),
             'designation': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': 'e.g. Assistant Professor, Lecturer, HOD',
+                'placeholder': 'e.g. Assistant Professor, Lecturer, HOD, Principal',
                 'required': True,
                 'id': 'id_designation'
             }),
             'department': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': 'e.g. Computer Science, Commerce, English',
+                'placeholder': 'e.g. Computer Science, Commerce, English, Management',
                 'required': True,
                 'id': 'id_department'
             }),
@@ -112,6 +186,11 @@ class MembershipRegistrationForm(forms.ModelForm):
                 'accept': 'image/*',
                 'id': 'id_photo'
             }),
+            'payment_screenshot': forms.FileInput(attrs={
+                'class': 'form-file',
+                'accept': 'image/*',
+                'id': 'id_payment_screenshot'
+            }),
             'declaration': forms.CheckboxInput(attrs={
                 'class': 'form-checkbox',
                 'id': 'id_declaration'
@@ -121,6 +200,12 @@ class MembershipRegistrationForm(forms.ModelForm):
     def clean_full_name(self):
         name = self.cleaned_data.get('full_name', '')
         return name.strip().upper()
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        if User.objects.filter(username=email).exists() or MembershipApplication.objects.filter(email=email).exists():
+            raise forms.ValidationError("An account with this email address already exists. Please login instead.")
+        return email
 
     def clean_mobile(self):
         mobile = self.cleaned_data.get('mobile', '')
@@ -135,3 +220,16 @@ class MembershipRegistrationForm(forms.ModelForm):
         if len(pin) != 6:
             raise forms.ValidationError("Please enter a valid 6-digit PIN code.")
         return pin
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get('password')
+        p2 = cleaned_data.get('confirm_password')
+        if p1 and p2 and p1 != p2:
+            self.add_error('confirm_password', "Passwords do not match. Please re-enter carefully.")
+        
+        wing = cleaned_data.get('wing')
+        other_wing = cleaned_data.get('other_wing', '').strip()
+        if wing == 'Other' and not other_wing:
+            self.add_error('other_wing', "Please specify your Wing name.")
+        return cleaned_data

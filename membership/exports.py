@@ -14,29 +14,32 @@ import docx
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
-from docx.oxml import OxmlElement, parse_xml
-from docx.oxml.ns import nsdecls, qn
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
-# ReportLab for PDF export
+# ReportLab & PyPDF for PDF export & Letterhead merging
+import pypdf
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage, KeepTogether
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch, cm
+from reportlab.lib.units import inch
 
 LOGO_PATH = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
+LETTERHEAD_PATH = os.path.join(settings.BASE_DIR, 'static', 'templates', 'letterhead.pdf')
 
 
 def export_applications_to_excel(queryset):
-    """Generate professional Excel spreadsheet of all registered members."""
+    """Generate professional Excel spreadsheet of all registered members with wings & payment status."""
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "KSFCTA Registered Members"
     ws.views.sheetView[0].showGridLines = True
 
     # Title Block
-    ws.merge_cells('A1:O1')
+    ws.merge_cells('A1:U1')
     title_cell = ws['A1']
     title_cell.value = "KERALA SELF FINANCING COLLEGE TEACHERS’ ASSOCIATION (KSFCTA)"
     title_cell.font = Font(name='Calibri', size=16, bold=True, color='FFFFFF')
@@ -44,7 +47,7 @@ def export_applications_to_excel(queryset):
     title_cell.alignment = Alignment(horizontal='center', vertical='center')
     ws.row_dimensions[1].height = 36
 
-    ws.merge_cells('A2:O2')
+    ws.merge_cells('A2:U2')
     sub_cell = ws['A2']
     sub_cell.value = f"Membership Campaign 2026 — Master Register (Generated: {datetime.now().strftime('%d-%b-%Y %I:%M %p')})"
     sub_cell.font = Font(name='Calibri', size=11, italic=True, color='FFFFFF')
@@ -52,15 +55,16 @@ def export_applications_to_excel(queryset):
     sub_cell.alignment = Alignment(horizontal='center', vertical='center')
     ws.row_dimensions[2].height = 24
 
-    # Column Headers
     headers = [
         "Sl No",
         "Application No",
+        "Membership ID",
         "Full Name",
         "Gender",
         "Date of Birth",
         "Mobile Number",
         "Email ID",
+        "Wing",
         "Institution / College",
         "Designation",
         "Department",
@@ -68,7 +72,11 @@ def export_applications_to_excel(queryset):
         "District",
         "PIN Code",
         "Membership Type",
-        "Status"
+        "Transaction ID / UTR",
+        "Payment Status",
+        "Approval Status",
+        "Rejection Reason",
+        "Verified At"
     ]
 
     header_fill = PatternFill(start_color='2563EB', end_color='2563EB', fill_type='solid')
@@ -89,7 +97,6 @@ def export_applications_to_excel(queryset):
         cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
         cell.border = border_thin
 
-    # Data Rows
     row_alt_fill = PatternFill(start_color='F8FAFC', end_color='F8FAFC', fill_type='solid')
     row_white_fill = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid')
 
@@ -101,11 +108,13 @@ def export_applications_to_excel(queryset):
         values = [
             idx,
             app.application_no,
+            app.membership_no or '',
             app.full_name,
             app.gender,
             app.dob.strftime('%d-%m-%Y') if app.dob else '',
             app.mobile,
             app.email,
+            app.display_wing,
             app.institution,
             app.designation,
             app.department,
@@ -113,7 +122,11 @@ def export_applications_to_excel(queryset):
             app.district,
             app.pincode,
             app.membership_type,
-            app.status
+            app.transaction_id or '',
+            app.payment_status,
+            app.status,
+            app.rejection_reason or '',
+            app.verified_at.strftime('%d-%m-%Y %I:%M %p') if app.verified_at else ''
         ]
 
         for col_num, val in enumerate(values, 1):
@@ -122,12 +135,11 @@ def export_applications_to_excel(queryset):
             cell.fill = fill
             cell.border = border_thin
             cell.font = Font(name='Calibri', size=10)
-            if col_num in [1, 2, 4, 5, 12, 13, 15]:
+            if col_num in [1, 2, 3, 5, 6, 9, 14, 15, 16, 17, 18, 19, 21]:
                 cell.alignment = Alignment(horizontal='center', vertical='center')
             else:
                 cell.alignment = Alignment(horizontal='left', vertical='center')
 
-    # Auto-adjust column widths
     for col in ws.columns:
         max_len = max(len(str(cell.value or '')) for cell in col)
         col_letter = get_column_letter(col[0].column)
@@ -143,41 +155,33 @@ def export_applications_to_excel(queryset):
 
 
 def set_cell_background(cell, fill_hex):
-    """Helper to set background color of a Word table cell."""
     tcPr = cell._tc.get_or_add_tcPr()
     shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>')
     tcPr.append(shd)
 
 
 def export_single_application_docx(app):
-    """Generate single filled official Word (.docx) document matching membership form.docx."""
+    """Generate filled Word (.docx) document matching membership form.docx with wings and fee details."""
     doc = Document()
 
-    # Page Margins
     for section in doc.sections:
         section.top_margin = Inches(0.6)
         section.bottom_margin = Inches(0.6)
         section.left_margin = Inches(0.7)
         section.right_margin = Inches(0.7)
 
-    # Header with Logo & Title
     header_table = doc.add_table(rows=1, cols=2)
     header_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     header_table.autofit = False
+    header_table.columns[0].width = Inches(1.2)
+    header_table.columns[1].width = Inches(5.8)
 
-    col_logo = header_table.columns[0]
-    col_text = header_table.columns[1]
-    col_logo.width = Inches(1.2)
-    col_text.width = Inches(5.8)
-
-    # Logo
     cell_logo = header_table.cell(0, 0)
     if os.path.exists(LOGO_PATH):
         p_logo = cell_logo.paragraphs[0]
         p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p_logo.add_run().add_picture(LOGO_PATH, width=Inches(1.0))
 
-    # Text
     cell_text = header_table.cell(0, 1)
     p_title = cell_text.paragraphs[0]
     p_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -193,19 +197,16 @@ def export_single_application_docx(app):
     r3 = p_title.add_run("KSFCTA MANDIR, VANCHIYOOR, THIRUVANANTHAPURAM – 695035\n")
     r3.font.size = Pt(8.5)
 
-    r4 = p_title.add_run("Email: ksfcta@gmail.com, info.ksfcta@gmail.com | Contact: 9995514415")
+    r4 = p_title.add_run("Contact: 9995514415")
     r4.font.size = Pt(8.5)
     r4.italic = True
 
-    # Horizontal divider rule
     p_div = doc.add_paragraph()
     p_div.paragraph_format.space_before = Pt(4)
     p_div.paragraph_format.space_after = Pt(4)
     r_div = p_div.add_run("━" * 62)
     r_div.font.color.rgb = RGBColor(26, 86, 219)
-    r_div.font.size = Pt(10)
 
-    # Form Heading
     p_form = doc.add_paragraph()
     p_form.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_form.paragraph_format.space_before = Pt(2)
@@ -215,7 +216,6 @@ def export_single_application_docx(app):
     r_fh.font.size = Pt(13)
     r_fh.underline = True
 
-    # Application details row
     p_meta = doc.add_paragraph()
     p_meta.paragraph_format.space_after = Pt(8)
     r_appno = p_meta.add_run(f"Application No: {app.application_no}           ")
@@ -223,26 +223,26 @@ def export_single_application_docx(app):
     r_date = p_meta.add_run(f"Date: {app.created_at.strftime('%d / %m / %Y')}")
     r_date.bold = True
 
-    # Table of form fields (11 points matching membership form.docx)
     fields = [
         ("1", "Name (in Block Letters):", app.full_name),
         ("2", "Gender:", app.gender),
         ("3", "Date of Birth:", app.dob.strftime('%d-%m-%Y') if app.dob else ''),
         ("4", "Mobile Number:", app.mobile),
         ("5", "Email ID:", app.email),
-        ("6", "Name of Institution:", app.institution),
-        ("7", "Designation:", app.designation),
-        ("8", "Department:", app.department),
-        ("9", "Category:", app.category),
-        ("10", "Permanent Address & PIN:", f"{app.address}\nDistrict: {app.district}, PIN: {app.pincode}"),
-        ("11", "Type of Membership:", app.membership_type),
+        ("6", "Wing:", app.display_wing),
+        ("7", "Name of Institution:", app.institution),
+        ("8", "Designation:", app.designation),
+        ("9", "Department:", app.department),
+        ("10", "Category:", app.category),
+        ("11", "Permanent Address & PIN:", f"{app.address}\nDistrict: {app.district}, PIN: {app.pincode}"),
+        ("12", "Type of Membership:", app.membership_type),
+        ("13", "Payment Details:", f"Fee: {app.membership_fee} | Status: {app.payment_status} | UTR: {app.transaction_id or 'N/A'}"),
     ]
 
     table = doc.add_table(rows=len(fields), cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
 
-    # Adjust widths
     for row in table.rows:
         row.cells[0].width = Inches(0.4)
         row.cells[1].width = Inches(2.2)
@@ -261,51 +261,46 @@ def export_single_application_docx(app):
 
         c2.text = str(val or '')
 
-        # Subtle row styling
         if idx % 2 == 0:
             set_cell_background(c0, "F8FAFC")
             set_cell_background(c1, "F8FAFC")
             set_cell_background(c2, "F8FAFC")
 
-    # Declaration Block
     p_dec_title = doc.add_paragraph()
-    p_dec_title.paragraph_format.space_before = Pt(12)
+    p_dec_title.paragraph_format.space_before = Pt(10)
     p_dec_title.paragraph_format.space_after = Pt(2)
     r_dt = p_dec_title.add_run("Declaration")
     r_dt.bold = True
     r_dt.font.size = Pt(11)
 
     p_dec = doc.add_paragraph()
-    p_dec.paragraph_format.space_after = Pt(24)
+    p_dec.paragraph_format.space_after = Pt(20)
     r_dec = p_dec.add_run(
         "I hereby declare that the information furnished above is true and correct to the best of my knowledge. "
         "I agree to abide by the Constitution, Rules and Regulations of the Self Financing College Teachers Association & Staff Union."
     )
-    r_dec.font.size = Pt(9.5)
+    r_dec.font.size = Pt(9)
     r_dec.italic = True
 
-    # Signature Row
     p_sig = doc.add_paragraph()
     p_sig.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    r_sig = p_sig.add_run(f"Digitally Confirmed / Signature of Applicant\n({app.full_name})")
+    r_sig = p_sig.add_run(f"Signature / Digitally Verified\n({app.full_name})")
     r_sig.bold = True
     r_sig.font.size = Pt(10)
 
-    # For Office Use Only Section
     p_off = doc.add_paragraph()
-    p_off.paragraph_format.space_before = Pt(10)
+    p_off.paragraph_format.space_before = Pt(8)
     p_off.paragraph_format.space_after = Pt(4)
     r_off = p_off.add_run("For Office Use Only")
     r_off.bold = True
     r_off.underline = True
-    r_off.font.size = Pt(11)
 
     off_table = doc.add_table(rows=4, cols=2)
     off_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     off_rows = [
         ("Application Received on:", app.created_at.strftime('%d / %m / %Y')),
-        ("Membership Fee Received:", app.membership_fee or "₹ __________________"),
-        ("Receipt No.:", app.receipt_no or "________________________"),
+        ("Membership Fee Received:", f"{app.membership_fee} (Status: {app.payment_status})"),
+        ("Receipt No / UTR:", app.receipt_no or app.transaction_id or "________________________"),
         ("Membership No. & Approved By:", f"{app.membership_no or '_________________'} / {app.approved_by or '_________________'}")
     ]
     for i, (k, v) in enumerate(off_rows):
@@ -316,7 +311,6 @@ def export_single_application_docx(app):
         row.cells[0].paragraphs[0].runs[0].bold = True
         row.cells[1].text = v
 
-    # Output to response
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     )
@@ -327,208 +321,209 @@ def export_single_application_docx(app):
     return response
 
 
-def export_single_application_pdf(app):
-    """Generate official PDF printable Membership Application Form matching official layout."""
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        rightMargin=36,
-        leftMargin=36,
-        topMargin=36,
-        bottomMargin=36
-    )
+def export_letterhead_certificate_pdf(app):
+    """
+    Generate Official Membership Certificate merged onto the official letterhead:
+    brown and grey professional letterhead (4).pdf
+    """
+    packet = io.BytesIO()
+    # A4 dimensions in points: 595.5 x 842.25
+    can = canvas.Canvas(packet, pagesize=(595.5, 842.25))
 
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        'MainTitle',
-        fontName='Helvetica-Bold',
-        fontSize=13,
-        leading=16,
-        textColor=colors.HexColor('#0F2B5C'),
-        alignment=1
-    )
-    sub_style = ParagraphStyle(
-        'SubTitle',
-        fontName='Helvetica',
-        fontSize=9,
-        leading=12,
-        textColor=colors.HexColor('#334155'),
-        alignment=1
-    )
-    form_hdr_style = ParagraphStyle(
-        'FormHdr',
-        fontName='Helvetica-Bold',
-        fontSize=12,
-        leading=14,
-        textColor=colors.HexColor('#1E3A8A'),
-        alignment=1
-    )
-    cell_lbl_style = ParagraphStyle(
-        'CellLbl',
-        fontName='Helvetica-Bold',
-        fontSize=9,
-        leading=11,
-        textColor=colors.HexColor('#0F172A')
-    )
-    cell_val_style = ParagraphStyle(
-        'CellVal',
-        fontName='Helvetica',
-        fontSize=9,
-        leading=12,
-        textColor=colors.HexColor('#1E293B')
-    )
+    # Header is already pre-printed on the letterhead from Y=700 to 842!
+    # Footer is already pre-printed on the letterhead from Y=0 to 90!
+    # Printable area: X=48 to 548, Y=100 to 670.
 
-    story = []
+    # 1. Certificate Title Banner
+    can.setFont('Helvetica-Bold', 15)
+    can.setFillColor(colors.HexColor('#0F2B5C'))
+    can.drawCentredString(297.75, 660, "MEMBERSHIP ADMISSION CERTIFICATE")
 
-    # Header with Logo & Association details
-    header_data = []
-    if os.path.exists(LOGO_PATH):
-        logo_img = RLImage(LOGO_PATH, width=1.1*inch, height=1.1*inch)
+    can.setFont('Helvetica-Bold', 9)
+    can.setFillColor(colors.HexColor('#1A56DB'))
+    can.drawCentredString(297.75, 646, "KSFCTA STATE MEMBERSHIP CAMPAIGN 2026")
+
+    # Thin decorative rule
+    can.setStrokeColor(colors.HexColor('#CBD5E1'))
+    can.setLineWidth(1)
+    can.line(55, 636, 540, 636)
+
+    # Reference & Date
+    can.setFont('Helvetica-Bold', 8.5)
+    can.setFillColor(colors.HexColor('#334155'))
+    ref_no = app.membership_no if app.membership_no else f"KSFCTA/MEM/2026/{app.id:04d}"
+    can.drawString(55, 622, f"Ref. No: {ref_no}")
+    can.drawRightString(540, 622, f"Date of Issue: {datetime.now().strftime('%d-%m-%Y')}")
+
+    # Salutation / To
+    can.setFont('Helvetica-Bold', 9.5)
+    can.setFillColor(colors.HexColor('#0F172A'))
+    can.drawString(55, 598, "To,")
+    can.drawString(55, 584, f"{app.full_name}")
+    can.setFont('Helvetica', 9)
+    can.setFillColor(colors.HexColor('#334155'))
+    can.drawString(55, 571, f"{app.designation}, Department of {app.department}")
+    can.drawString(55, 558, f"{app.institution}, {app.district} – {app.pincode}")
+
+    # Certification statement
+    can.setFont('Helvetica', 9.5)
+    can.setFillColor(colors.HexColor('#1E293B'))
+    statement_1 = (
+        f"This is to certify that {app.full_name} has been officially registered, verified, and admitted"
+    )
+    statement_2 = (
+        f"as an accredited member of the Kerala Self Financing College Teachers’ Association (KSFCTA)"
+    )
+    statement_3 = (
+        f"under the patronage of KPCTA, following the democratic and progressive ideology of the Indian National Congress."
+    )
+    can.drawString(55, 532, statement_1)
+    can.drawString(55, 519, statement_2)
+    can.drawString(55, 506, statement_3)
+
+    # Details Box (Official Membership Credential Card)
+    can.setFillColor(colors.HexColor('#FFFFFF'))
+    can.setStrokeColor(colors.HexColor('#93C5FD'))
+    can.setLineWidth(1.2)
+    can.roundRect(55, 235, 485, 240, 8, fill=1, stroke=1)
+
+    # Card Top Banner (Navy Blue)
+    can.setFillColor(colors.HexColor('#0F2B5C'))
+    can.roundRect(55, 442, 485, 33, 6, fill=1, stroke=0)
+    can.rect(55, 442, 485, 10, fill=1, stroke=0) # square bottom corners
+
+    can.setFont('Helvetica-Bold', 11)
+    can.setFillColor(colors.white)
+    can.drawString(70, 454, "OFFICIAL MEMBERSHIP CREDENTIAL CARD")
+    
+    mem_display = app.membership_no if app.membership_no else f"KSFCTA-{app.created_at.year}-{app.id:04d}"
+    can.setFont('Helvetica-Bold', 10)
+    can.setFillColor(colors.HexColor('#FDE047')) # Gold accent
+    can.drawRightString(525, 454, f"ID: {mem_display}")
+
+    # Draw Member Passport Photo on the Right
+    photo_x = 425
+    photo_y = 295
+    photo_w = 95
+    photo_h = 125
+
+    # Photo Frame Border
+    can.setFillColor(colors.HexColor('#F8FAFC'))
+    can.setStrokeColor(colors.HexColor('#93C5FD'))
+    can.setLineWidth(1.5)
+    can.roundRect(photo_x, photo_y, photo_w, photo_h, 4, fill=1, stroke=1)
+
+    photo_drawn = False
+    if app.photo:
+        try:
+            photo_path = app.photo.path if hasattr(app.photo, 'path') else str(app.photo)
+            if os.path.exists(photo_path):
+                can.drawImage(photo_path, photo_x + 2, photo_y + 2, width=photo_w - 4, height=photo_h - 4, preserveAspectRatio=True, anchor='c')
+                photo_drawn = True
+        except Exception:
+            photo_drawn = False
+
+    if not photo_drawn:
+        can.setFont('Helvetica-Bold', 8)
+        can.setFillColor(colors.HexColor('#94A3B8'))
+        can.drawCentredString(photo_x + (photo_w / 2), photo_y + (photo_h / 2) + 6, "MEMBER")
+        can.drawCentredString(photo_x + (photo_w / 2), photo_y + (photo_h / 2) - 6, "PHOTO")
+
+    # Name label under photo
+    can.setFont('Helvetica-Bold', 7.5)
+    can.setFillColor(colors.HexColor('#0F2B5C'))
+    short_name = app.full_name[:18]
+    can.drawCentredString(photo_x + (photo_w / 2), photo_y - 12, short_name)
+
+    # Member Details on the Left Side
+    can.setFont('Helvetica-Bold', 9.5)
+    can.setFillColor(colors.HexColor('#1E40AF'))
+    can.drawString(70, 420, f"Unique ID:  {mem_display}")
+
+    can.setFont('Helvetica-Bold', 9)
+    can.setFillColor(colors.HexColor('#0F172A'))
+    can.drawString(70, 402, f"Member Name:  {app.full_name}")
+
+    can.setFont('Helvetica-Bold', 8.5)
+    can.setFillColor(colors.HexColor('#334155'))
+    can.drawString(70, 384, f"Designated Wing:  {app.display_wing}")
+
+    can.setFont('Helvetica', 8.5)
+    can.setFillColor(colors.HexColor('#334155'))
+    can.drawString(70, 366, f"Designation:  {app.designation}")
+    can.drawString(70, 348, f"Department:  {app.department}")
+    can.drawString(70, 330, f"Institution:  {app.institution[:36]}")
+    can.drawString(70, 312, f"District Chapter:  {app.district} (PIN: {app.pincode})")
+    can.drawString(70, 294, f"Membership Type:  {app.membership_type} (Category: {app.category})")
+
+    # Verification Status Pill on Card
+    can.setFillColor(colors.HexColor('#ECFDF5'))
+    can.setStrokeColor(colors.HexColor('#A7F3D0'))
+    can.roundRect(70, 268, 230, 20, 3, fill=1, stroke=1)
+    can.setFont('Helvetica-Bold', 8)
+    can.setFillColor(colors.HexColor('#047857'))
+    can.drawString(76, 274, "STATUS: VERIFIED & ACCREDITED MEMBER ✔")
+
+    # Payment Confirmation Pill
+    can.setFillColor(colors.HexColor('#EFF6FF'))
+    can.setStrokeColor(colors.HexColor('#BFDBFE'))
+    can.roundRect(310, 268, 105, 20, 3, fill=1, stroke=1)
+    can.setFont('Helvetica-Bold', 7.5)
+    can.setFillColor(colors.HexColor('#1D4ED8'))
+    can.drawString(316, 274, f"Fee: {app.membership_fee} Paid")
+
+    # Card Bottom Watermark Banner
+    can.setStrokeColor(colors.HexColor('#E2E8F0'))
+    can.setLineWidth(0.8)
+    can.line(70, 256, 525, 256)
+    can.setFont('Helvetica-Bold', 7.5)
+    can.setFillColor(colors.HexColor('#64748B'))
+    can.drawCentredString(297.75, 244, "Under Patronage of KPCTA & Democratic Ideology of Indian National Congress")
+
+    # Slogan banner
+    can.setFillColor(colors.HexColor('#EFF6FF'))
+    can.setStrokeColor(colors.HexColor('#BFDBFE'))
+    can.setLineWidth(1)
+    can.roundRect(55, 172, 485, 42, 4, fill=1, stroke=1)
+    can.setFont('Helvetica-Bold', 9.5)
+    can.setFillColor(colors.HexColor('#1D4ED8'))
+    can.drawCentredString(297.75, 196, "UNITED TEACHERS • STRONGER VOICE • BETTER FUTURE")
+    can.setFont('Helvetica', 8)
+    can.setFillColor(colors.HexColor('#475569'))
+    can.drawCentredString(297.75, 182, "Kerala Self Financing College Teachers’ Association (Reg. No: TVM/TC/425/2023)")
+
+    # Official Digital Verification Note
+    can.setFont('Helvetica', 7.5)
+    can.setFillColor(colors.HexColor('#64748B'))
+    can.drawCentredString(297.75, 142, "This certificate is officially issued and digitally verified by the State Committee of KSFCTA.")
+    can.drawCentredString(297.75, 130, "For official membership verification, contact: 9995514415 | KSFCTA Mandir, Vanchiyoor, Thiruvananthapuram – 695035")
+
+    can.save()
+    packet.seek(0)
+
+    # Merge onto letterhead template
+    if os.path.exists(LETTERHEAD_PATH):
+        try:
+            overlay_pdf = pypdf.PdfReader(packet)
+            letterhead_pdf = pypdf.PdfReader(LETTERHEAD_PATH)
+            writer = pypdf.PdfWriter()
+
+            page = letterhead_pdf.pages[0]
+            page.merge_page(overlay_pdf.pages[0])
+            writer.add_page(page)
+
+            out_buffer = io.BytesIO()
+            writer.write(out_buffer)
+            out_buffer.seek(0)
+            pdf_bytes = out_buffer.getvalue()
+        except Exception:
+            pdf_bytes = packet.getvalue()
     else:
-        logo_img = Paragraph("<b>KSFCTA</b>", title_style)
+        pdf_bytes = packet.getvalue()
 
-    header_text = Paragraph(
-        "<b>KERALA SELF FINANCING COLLEGE TEACHERS’ ASSOCIATION</b><br/>"
-        "<font size=8><b>(Reg. No.: TVM/TC/425/2023)</b></font><br/>"
-        "<font size=8>KSFCTA Mandir, Vanchiyoor, Thiruvananthapuram – 695035, Kerala</font><br/>"
-        "<font size=7.5 color='#475569'>Email: ksfcta@gmail.com, info.ksfcta@gmail.com | Phone: 9995514415</font>",
-        ParagraphStyle('HdrTxt', fontName='Helvetica', leading=13, alignment=0)
-    )
-
-    hdr_table = Table([[logo_img, header_text]], colWidths=[1.3*inch, 5.7*inch])
-    hdr_table.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(hdr_table)
-    story.append(Spacer(1, 6))
-
-    # Divider bar
-    div_table = Table([['']], colWidths=[7.0*inch], rowHeights=[2])
-    div_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#1A56DB')),
-    ]))
-    story.append(div_table)
-    story.append(Spacer(1, 8))
-
-    # Form Title
-    story.append(Paragraph("MEMBERSHIP APPLICATION FORM – 2026", form_hdr_style))
-    story.append(Spacer(1, 6))
-
-    # Metadata Row (App No & Date)
-    meta_table = Table([
-        [
-            Paragraph(f"<b>Application No:</b> <font color='#1A56DB'>{app.application_no}</font>", cell_val_style),
-            Paragraph(f"<b>Status:</b> <b>{app.status}</b>", cell_val_style),
-            Paragraph(f"<b>Date:</b> {app.created_at.strftime('%d-%m-%Y')}", cell_val_style)
-        ]
-    ], colWidths=[2.8*inch, 2.0*inch, 2.2*inch])
-    meta_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F1F5F9')),
-        ('PADDING', (0,0), (-1,-1), 5),
-        ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#CBD5E1')),
-    ]))
-    story.append(meta_table)
-    story.append(Spacer(1, 8))
-
-    # Data Table matching 11 points
-    fields = [
-        ("1", "Name (in Block Letters)", app.full_name),
-        ("2", "Gender", app.gender),
-        ("3", "Date of Birth", app.dob.strftime('%d-%m-%Y') if app.dob else ''),
-        ("4", "Mobile Number", app.mobile),
-        ("5", "Email ID", app.email),
-        ("6", "Name of Institution", app.institution),
-        ("7", "Designation", app.designation),
-        ("8", "Department", app.department),
-        ("9", "Category", app.category),
-        ("10", "Permanent Address", f"{app.address}<br/><b>District:</b> {app.district} &nbsp;|&nbsp; <b>PIN:</b> {app.pincode}"),
-        ("11", "Type of Membership", app.membership_type),
-    ]
-
-    table_data = []
-    for sl, label, val in fields:
-        table_data.append([
-            Paragraph(f"<b>{sl}</b>", cell_lbl_style),
-            Paragraph(f"<b>{label}</b>", cell_lbl_style),
-            Paragraph(str(val or ''), cell_val_style)
-        ])
-
-    data_table = Table(table_data, colWidths=[0.4*inch, 2.3*inch, 4.3*inch])
-    data_table.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('PADDING', (0,0), (-1,-1), 4),
-        ('ROWBACKGROUNDS', (0,0), (-1,-1), [colors.HexColor('#FFFFFF'), colors.HexColor('#F8FAFC')]),
-    ]))
-    story.append(data_table)
-    story.append(Spacer(1, 8))
-
-    # Declaration Box
-    dec_text = (
-        "<b>Declaration:</b><br/>"
-        "<i>I hereby declare that the information furnished above is true and correct to the best of my knowledge. "
-        "I agree to abide by the Constitution, Rules and Regulations of the Self Financing College Teachers Association & Staff Union.</i>"
-    )
-    dec_table = Table([[Paragraph(dec_text, cell_val_style)]], colWidths=[7.0*inch])
-    dec_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#EFF6FF')),
-        ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#93C5FD')),
-        ('PADDING', (0,0), (-1,-1), 6),
-    ]))
-    story.append(dec_table)
-    story.append(Spacer(1, 10))
-
-    # Signature Row
-    sig_table = Table([
-        [
-            Paragraph(f"<b>Date:</b> {datetime.now().strftime('%d-%m-%Y')}", cell_val_style),
-            Paragraph(f"<b>Signature of Applicant:</b><br/><font color='#2563EB'>[Digitally Verified - {app.full_name}]</font>", cell_val_style)
-        ]
-    ], colWidths=[3.5*inch, 3.5*inch])
-    sig_table.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'BOTTOM'),
-        ('ALIGN', (1,0), (1,0), 'RIGHT'),
-    ]))
-    story.append(sig_table)
-    story.append(Spacer(1, 10))
-
-    # For Office Use Only Section
-    off_data = [
-        [
-            Paragraph("<b>FOR OFFICE USE ONLY</b>", form_hdr_style),
-            Paragraph("", cell_val_style)
-        ],
-        [
-            Paragraph(f"<b>Application Received on:</b> {app.created_at.strftime('%d-%m-%Y')}", cell_val_style),
-            Paragraph(f"<b>Membership Fee Received:</b> {app.membership_fee or '₹ ....................'}", cell_val_style)
-        ],
-        [
-            Paragraph(f"<b>Receipt No:</b> {app.receipt_no or '..........................'}", cell_val_style),
-            Paragraph(f"<b>Membership No:</b> {app.membership_no or '..........................'}", cell_val_style)
-        ],
-        [
-            Paragraph(f"<b>Approved By:</b> {app.approved_by or 'State President / General Secretary'}", cell_val_style),
-            Paragraph(f"<b>Office Seal & Date:</b> ..........................", cell_val_style)
-        ]
-    ]
-    off_table = Table(off_data, colWidths=[3.5*inch, 3.5*inch])
-    off_table.setStyle(TableStyle([
-        ('SPAN', (0,0), (1,0)),
-        ('BACKGROUND', (0,0), (1,0), colors.HexColor('#E2E8F0')),
-        ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#94A3B8')),
-        ('GRID', (0,1), (-1,-1), 0.5, colors.HexColor('#CBD5E1')),
-        ('PADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(off_table)
-
-    doc.build(story)
-    buffer.seek(0)
-
-    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response = HttpResponse(pdf_bytes, content_type='application/pdf')
     safe_name = "".join(c for c in app.full_name if c.isalnum() or c in (' ', '_')).rstrip()
-    response['Content-Disposition'] = f'attachment; filename="KSFCTA_Form_{app.application_no}_{safe_name}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="KSFCTA_Certificate_{app.application_no}_{safe_name}.pdf"'
     return response
 
 
@@ -564,8 +559,8 @@ def export_summary_pdf(queryset):
     td_style = ParagraphStyle(
         'TD',
         fontName='Helvetica',
-        fontSize=7.5,
-        leading=9.5,
+        fontSize=7,
+        leading=9,
         textColor=colors.HexColor('#1E293B')
     )
 
@@ -578,12 +573,11 @@ def export_summary_pdf(queryset):
         Paragraph("Sl", th_style),
         Paragraph("App No", th_style),
         Paragraph("Name", th_style),
-        Paragraph("Gender", th_style),
+        Paragraph("Wing", th_style),
         Paragraph("Mobile", th_style),
         Paragraph("Institution", th_style),
-        Paragraph("Designation", th_style),
         Paragraph("District", th_style),
-        Paragraph("Type", th_style),
+        Paragraph("Payment", th_style),
         Paragraph("Status", th_style)
     ]
     rows = [headers]
@@ -593,17 +587,16 @@ def export_summary_pdf(queryset):
             Paragraph(str(idx), td_style),
             Paragraph(app.application_no, td_style),
             Paragraph(app.full_name, td_style),
-            Paragraph(app.gender, td_style),
+            Paragraph(app.display_wing[:24], td_style),
             Paragraph(app.mobile, td_style),
             Paragraph(app.institution[:25], td_style),
-            Paragraph(app.designation[:20], td_style),
             Paragraph(app.district, td_style),
-            Paragraph(app.membership_type.replace(' Membership', ''), td_style),
-            Paragraph(app.status, td_style),
+            Paragraph(app.payment_status.replace(' Verification', ''), td_style),
+            Paragraph(app.status.replace(' / Accepted', ''), td_style),
         ])
 
     table = Table(rows, colWidths=[
-        0.3*inch, 1.0*inch, 1.2*inch, 0.5*inch, 0.8*inch, 1.4*inch, 0.9*inch, 0.8*inch, 0.6*inch, 0.5*inch
+        0.3*inch, 1.0*inch, 1.2*inch, 1.1*inch, 0.8*inch, 1.4*inch, 0.8*inch, 0.7*inch, 0.7*inch
     ])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0F2B5C')),

@@ -1072,6 +1072,7 @@ img {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-table {
@@ -1149,23 +1150,341 @@ img {
 }
 
 /* ==========================================================================
-   Responsive Breakpoints
+   Semantic Responsive Component Classes
    ========================================================================== */
-@media (max-width: 992px) {
-  .hero-grid { grid-template-columns: 1fr; }
-  .campaign-meta-grid { grid-template-columns: 1fr; }
-  .details-grid { grid-template-columns: 1fr; }
-  .toolbar-grid { grid-template-columns: 1fr 1fr; }
-  .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
-  .hero-title { font-size: 2.2rem; }
+.payment-box-wrapper {
+  background: #FFFFFF;
+  border: 1.5px solid #93C5FD;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
 }
 
-@media (max-width: 640px) {
-  .header-inner { flex-direction: column; gap: 12px; text-align: center; }
-  .hero-title { font-size: 1.8rem; }
-  .hero-actions { flex-direction: column; width: 100%; }
-  .btn { width: 100%; }
-  .countdown-wrap { flex-direction: column; text-align: center; }
-  .toolbar-grid { grid-template-columns: 1fr; }
-  .form-wrapper { padding: 24px 16px; }
+.payment-layout-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.payment-qr-card {
+  text-align: center;
+  background: #F8FAFC;
+  border: 2px solid #BFDBFE;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.payment-qr-card img {
+  width: 240px;
+  height: 240px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  border: 2px solid #0F2B5C;
+  margin: 0 auto 10px;
+  background: #FFFFFF;
+  padding: 6px;
+  box-shadow: var(--shadow-md);
+  display: block;
+}
+
+.payment-bank-details {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.login-modal-box {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: 36px;
+  position: relative;
+}
+
+.portal-grid-split {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 32px;
+}
+
+.portal-grid-split.detail-view {
+  grid-template-columns: 2fr 1fr;
+  gap: 28px;
+}
+
+.profile-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.mobile-table-hint {
+  display: none;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (Desktop, Tablet & Mobile)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .hero-title {
+    font-size: 2.3rem;
+  }
+  .campaign-meta-grid {
+    grid-template-columns: 1fr;
+  }
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  .toolbar-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .portal-grid-split,
+  .portal-grid-split.detail-view {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  .section {
+    padding: 48px 0;
+  }
+  .hero-section {
+    padding: 36px 0 28px;
+  }
+  .hero-title {
+    font-size: 1.85rem;
+    line-height: 1.2;
+  }
+  .hero-campaign-sub {
+    font-size: 1.15rem;
+  }
+  .hero-dates-badge {
+    font-size: 0.92rem;
+    padding: 5px 14px;
+    margin-bottom: 14px;
+  }
+  .hero-slogan {
+    font-size: 0.95rem;
+    line-height: 1.35;
+    margin-bottom: 18px;
+  }
+  .hero-about-box {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    margin-bottom: 20px;
+  }
+
+  .campaign-details-card {
+    padding: 28px 20px;
+    margin-bottom: 36px;
+  }
+  .campaign-details-card h3 {
+    font-size: 1.4rem;
+  }
+  .campaign-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .details-section {
+    padding: 48px 0;
+  }
+  .message-card, .contact-card {
+    padding: 24px 18px;
+  }
+
+  /* Payment block mobile layout */
+  .payment-box-wrapper {
+    padding: 18px 14px;
+  }
+  .payment-layout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  .payment-qr-card {
+    padding: 14px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .payment-qr-card img {
+    width: 210px;
+    height: 210px;
+  }
+  .payment-bank-details {
+    text-align: left;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    padding: 14px;
+  }
+
+  /* Form responsive adjustments */
+  .form-wrapper {
+    padding: 24px 16px;
+    border-radius: var(--radius-lg);
+  }
+  .form-header-bar {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  .form-header-logo {
+    margin: 0 auto;
+    width: 52px;
+    height: 52px;
+  }
+  .form-grid-2, .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .profile-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .toolbar-grid {
+    grid-template-columns: 1fr;
+  }
+  .login-modal-box {
+    padding: 24px 18px;
+    border-radius: var(--radius-lg);
+  }
+  .mobile-table-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: #1E40AF;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: var(--radius-sm);
+    padding: 7px 12px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-inner {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  .brand-wrapper {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  .brand-logo {
+    width: 46px;
+    height: 46px;
+  }
+  .brand-text h1 {
+    font-size: 1.02rem;
+    line-height: 1.25;
+  }
+  .brand-text p {
+    font-size: 0.72rem;
+  }
+  .header-cta {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+  .header-cta .btn {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 12px;
+    font-size: 0.85rem;
+  }
+
+  .hero-title {
+    font-size: 1.55rem;
+  }
+  .hero-campaign-sub {
+    font-size: 1.05rem;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  /* Countdown on mobile phone */
+  .countdown-strip {
+    padding: 24px 0;
+  }
+  .countdown-wrap {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  .countdown-timer {
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+  }
+  .timer-box {
+    flex: 1;
+    min-width: 0;
+    max-width: 72px;
+    padding: 8px 4px;
+  }
+  .timer-val {
+    font-size: 1.3rem;
+  }
+  .timer-lbl {
+    font-size: 0.58rem;
+  }
+
+  /* Form & Submit Button on phone */
+  .form-wrapper {
+    padding: 18px 12px;
+    border-radius: var(--radius-md);
+  }
+  .form-input, .form-select, .form-textarea {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+  .btn-submit-large {
+    font-size: 0.92rem;
+    padding: 13px 14px;
+    white-space: normal;
+  }
+
+  /* Admin KPIs on phone */
+  .stats-grid-portal {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .stat-metric-card {
+    padding: 12px 10px;
+  }
+  .stat-metric-card .number {
+    font-size: 1.4rem;
+  }
+  .stat-metric-card .label {
+    font-size: 0.7rem;
+  }
 }

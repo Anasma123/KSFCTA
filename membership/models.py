@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 class MembershipApplication(models.Model):
@@ -11,6 +12,17 @@ class MembershipApplication(models.Model):
     CATEGORY_CHOICES = [
         ('Teaching Staff', 'Teaching Staff'),
         ('Non-Teaching Staff', 'Non-Teaching Staff'),
+    ]
+
+    WING_CHOICES = [
+        ('Arts and sciences', 'Arts and sciences'),
+        ('Teacher Education', 'Teacher Education'),
+        ('Law colleges', 'Law colleges'),
+        ('Engineering Colleges', 'Engineering Colleges'),
+        ('Health and Allied Sciences', 'Health and Allied Sciences'),
+        ('Principal', 'Principal'),
+        ('Administrative Staffs', 'Administrative Staffs'),
+        ('Other', 'Other (Please Specify)'),
     ]
 
     MEMBERSHIP_TYPE_CHOICES = [
@@ -36,10 +48,19 @@ class MembershipApplication(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('Approved', 'Approved'),
+        ('Pending', 'Pending Review'),
+        ('Approved', 'Approved / Accepted'),
         ('Rejected', 'Rejected'),
     ]
+
+    PAYMENT_STATUS_CHOICES = [
+        ('Pending Verification', 'Pending Verification'),
+        ('Verified', 'Verified'),
+        ('Rejected', 'Payment Rejected'),
+    ]
+
+    # Linked User account for member login (using Email as username)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='application')
 
     # Application ID
     application_no = models.CharField(max_length=30, unique=True, editable=False)
@@ -56,8 +77,12 @@ class MembershipApplication(models.Model):
     # 4. Mobile Number
     mobile = models.CharField(max_length=15, verbose_name="Mobile Number")
 
-    # 5. Email ID
-    email = models.EmailField(verbose_name="Email ID")
+    # 5. Email ID (Used as Login Username)
+    email = models.EmailField(verbose_name="Email ID", unique=True)
+
+    # Wings
+    wing = models.CharField(max_length=50, choices=WING_CHOICES, default='Arts and sciences', verbose_name="Wing")
+    other_wing = models.CharField(max_length=150, blank=True, default='', verbose_name="Other Wing (Specify)")
 
     # 6. Name of Institution
     institution = models.CharField(max_length=250, verbose_name="Name of Institution")
@@ -82,20 +107,33 @@ class MembershipApplication(models.Model):
     # Photo (Optional)
     photo = models.ImageField(upload_to='photos/%Y/%m/', blank=True, null=True, verbose_name="Applicant Photo")
 
+    # Payment Details (Fee: ₹ 200)
+    membership_fee = models.CharField(max_length=100, default='₹ 200', verbose_name="Membership Fee")
+    transaction_id = models.CharField(max_length=100, blank=True, default='', verbose_name="Transaction ID / UTR")
+    payment_screenshot = models.ImageField(upload_to='payments/%Y/%m/', blank=True, null=True, verbose_name="Payment Screenshot")
+    payment_status = models.CharField(max_length=30, choices=PAYMENT_STATUS_CHOICES, default='Pending Verification', verbose_name="Payment Status")
+
     # Declaration
     declaration = models.BooleanField(default=True, verbose_name="Agreed to Declaration")
 
-    # Office Use Only Fields
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-    membership_fee = models.CharField(max_length=100, blank=True, default='', verbose_name="Membership Fee Received")
+    # Office Verification & Approval Fields
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending', verbose_name="Application Status")
     receipt_no = models.CharField(max_length=100, blank=True, default='', verbose_name="Receipt No")
     membership_no = models.CharField(max_length=100, blank=True, default='', verbose_name="Membership No")
     approved_by = models.CharField(max_length=150, blank=True, default='', verbose_name="Approved By")
     admin_notes = models.TextField(blank=True, default='', verbose_name="Office Notes")
+    rejection_reason = models.TextField(blank=True, default='', verbose_name="Rejection Reason")
+    verified_at = models.DateTimeField(null=True, blank=True, verbose_name="Verified Date")
 
     # Timestamps
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Application Date")
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def display_wing(self):
+        if self.wing == 'Other' and self.other_wing:
+            return f"Other ({self.other_wing})"
+        return self.wing
 
     class Meta:
         ordering = ['-created_at']
@@ -103,7 +141,7 @@ class MembershipApplication(models.Model):
         verbose_name_plural = "Membership Applications"
 
     def __str__(self):
-        return f"{self.application_no} - {self.full_name} ({self.institution})"
+        return f"{self.application_no} - {self.full_name} ({self.wing})"
 
     def save(self, *args, **kwargs):
         if not self.application_no:
