@@ -105,13 +105,16 @@ class MembershipApplication(models.Model):
     # 11. Type of Membership
     membership_type = models.CharField(max_length=30, choices=MEMBERSHIP_TYPE_CHOICES, default='Annual Membership', verbose_name="Type of Membership")
 
-    # Photo (Optional)
-    photo = models.ImageField(upload_to='photos/%Y/%m/', blank=True, null=True, verbose_name="Applicant Photo")
-
     # Payment Details (Fee: ₹ 200)
     membership_fee = models.CharField(max_length=100, default='₹ 200', verbose_name="Membership Fee")
-    transaction_id = models.CharField(max_length=100, blank=True, default='', verbose_name="Transaction ID / UTR")
-    payment_screenshot = models.ImageField(upload_to='payments/%Y/%m/', blank=True, null=True, verbose_name="Payment Screenshot")
+    # 12. Passport Size Photo (Stored as Base64 string)
+    photo = models.TextField(null=True, blank=True, verbose_name="Base64 Photo")
+
+    # Payment details
+    transaction_id = models.CharField(max_length=150, blank=True, null=True, verbose_name="Transaction ID / UTR No")
+    
+    # Stored as Base64 string
+    payment_screenshot = models.TextField(null=True, blank=True, verbose_name="Base64 Payment Screenshot")
     payment_status = models.CharField(max_length=30, choices=PAYMENT_STATUS_CHOICES, default='Pending Verification', verbose_name="Payment Status")
 
     # Declaration

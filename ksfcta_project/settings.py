@@ -118,8 +118,8 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Use cookie-based sessions to prevent logouts on Vercel's ephemeral filesystem
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# Use default database-backed sessions (Now supported securely by Neon Postgres)
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 # Disable all server-side caching (Vercel edge cache prevention)
 CACHE_MIDDLEWARE_SECONDS = 0

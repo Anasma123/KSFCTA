@@ -147,12 +147,14 @@ def member_dashboard_view(request):
 
     # Allow member to upload payment proof if not already uploaded
     if request.method == 'POST' and 'update_payment' in request.POST:
+        import base64
         tx_id = request.POST.get('transaction_id', '').strip()
         screenshot = request.FILES.get('payment_screenshot')
         if tx_id:
             app.transaction_id = tx_id
-        if screenshot:
-            app.payment_screenshot = screenshot
+        if screenshot and hasattr(screenshot, 'read'):
+            encoded = base64.b64encode(screenshot.read()).decode('utf-8')
+            app.payment_screenshot = f"data:{screenshot.content_type};base64,{encoded}"
         app.save()
         messages.success(request, "Payment details submitted for verification!")
         return redirect('member_dashboard')

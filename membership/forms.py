@@ -233,3 +233,23 @@ class MembershipRegistrationForm(forms.ModelForm):
         if wing == 'Other' and not other_wing:
             self.add_error('other_wing', "Please specify your Wing name.")
         return cleaned_data
+        
+    def save(self, commit=True):
+        import base64
+        instance = super().save(commit=False)
+        
+        # Convert uploaded photo to base64
+        photo_file = self.cleaned_data.get('photo')
+        if photo_file and hasattr(photo_file, 'read'):
+            encoded = base64.b64encode(photo_file.read()).decode('utf-8')
+            instance.photo = f"data:{photo_file.content_type};base64,{encoded}"
+            
+        # Convert uploaded screenshot to base64
+        payment_file = self.cleaned_data.get('payment_screenshot')
+        if payment_file and hasattr(payment_file, 'read'):
+            encoded = base64.b64encode(payment_file.read()).decode('utf-8')
+            instance.payment_screenshot = f"data:{payment_file.content_type};base64,{encoded}"
+            
+        if commit:
+            instance.save()
+        return instance

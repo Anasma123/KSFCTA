@@ -44,7 +44,7 @@
     <div class="member-hero-top">
       <div class="member-hero-profile">
         {% if app.photo %}
-          <img src="{{ app.photo.url }}" alt="{{ app.full_name }}" class="member-hero-img" />
+          <img src="{{ app.photo }}" alt="{{ app.full_name }}" class="member-hero-img" />
         {% else %}
           <div class="member-hero-img-placeholder">No Photo</div>
         {% endif %}
@@ -176,6 +176,7 @@
 
     <!-- RIGHT: Fee Payment & Proof Verification -->
     <div>
+      {% if app.payment_status != 'Verified' %}
       <div class="portal-card">
         <h3 class="portal-card-title-sm">Membership Fee &amp; Payment (₹ 200)</h3>
         
@@ -205,7 +206,7 @@
             <input type="file" name="payment_screenshot" id="member_screenshot" accept="image/*" class="form-file" />
             {% if app.payment_screenshot %}
               <div style="margin-top: 6px; font-size: 0.8rem; color: #059669;">
-                ✔ Current receipt uploaded. <a href="{{ app.payment_screenshot.url }}" target="_blank" style="text-decoration: underline;">View</a>
+                ✔ Current receipt uploaded. <a href="{{ app.payment_screenshot }}" target="_blank" style="text-decoration: underline;">View</a>
               </div>
             {% endif %}
           </div>
@@ -215,6 +216,7 @@
           </button>
         </form>
       </div>
+      {% endif %}
     </div>
 
   </div>
