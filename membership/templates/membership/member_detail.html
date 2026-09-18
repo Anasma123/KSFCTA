@@ -194,73 +194,17 @@
     <!-- RIGHT: Office Endorsement & Update Controls -->
     <div>
       <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
-        <h3 style="font-size: 1.2rem; color: var(--primary-navy); margin-bottom: 16px;">Verification Endorsement</h3>
+        <h3 style="font-size: 1.2rem; color: var(--primary-navy); margin-bottom: 16px; text-align: center;">Applicant Photo</h3>
         
         <div style="text-align: center; margin-bottom: 20px;">
           {% if app.photo %}
-            <img src="{{ app.photo }}" alt="Applicant Photo" style="width: 130px; height: 150px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid var(--border-medium); margin: 0 auto;" />
+            <img src="{{ app.photo }}" alt="Applicant Photo" style="width: 150px; height: 180px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid var(--border-medium); margin: 0 auto;" />
           {% else %}
-            <div style="width: 130px; height: 150px; background: var(--bg-subtle); border: 2px dashed var(--border-medium); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">
+            <div style="width: 150px; height: 180px; background: var(--bg-subtle); border: 2px dashed var(--border-medium); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">
               No Photo Uploaded
             </div>
           {% endif %}
         </div>
-
-        <form method="post">
-          {% csrf_token %}
-          
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_status">Application Status</label>
-            <select name="status" id="id_status" class="form-select">
-              <option value="Pending" {% if app.status == 'Pending' %}selected{% endif %}>Pending Verification</option>
-              <option value="Approved" {% if app.status == 'Approved' %}selected{% endif %}>Approved / Accepted</option>
-              <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
-            </select>
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_payment_status">Payment Status</label>
-            <select name="payment_status" id="id_payment_status" class="form-select">
-              <option value="Pending Verification" {% if app.payment_status == 'Pending Verification' %}selected{% endif %}>Pending Verification</option>
-              <option value="Verified" {% if app.payment_status == 'Verified' %}selected{% endif %}>Verified</option>
-              <option value="Rejected" {% if app.payment_status == 'Rejected' %}selected{% endif %}>Payment Rejected</option>
-            </select>
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_membership_no">Official Membership No.</label>
-            <input type="text" name="membership_no" id="id_membership_no" value="{{ app.membership_no }}" class="form-input" placeholder="e.g. KSFCTA/MEM/2026/0145" />
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_receipt_no">Receipt / UTR No.</label>
-            <input type="text" name="receipt_no" id="id_receipt_no" value="{{ app.receipt_no|default:app.transaction_id }}" class="form-input" placeholder="e.g. UTR23456789" />
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_membership_fee">Membership Fee</label>
-            <input type="text" name="membership_fee" id="id_membership_fee" value="{{ app.membership_fee }}" class="form-input" />
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_approved_by">Approved By</label>
-            <input type="text" name="approved_by" id="id_approved_by" value="{{ app.approved_by|default:'Shafi K (Admin)' }}" class="form-input" />
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label class="field-label" for="id_rejection_reason" style="color: #DC2626; font-weight: 700;">Rejection Reason (Visible to Member on Dashboard)</label>
-            <textarea name="rejection_reason" id="id_rejection_reason" rows="3" class="form-textarea" placeholder="Enter reason for rejection...">{{ app.rejection_reason }}</textarea>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label class="field-label" for="id_admin_notes">Administrative Notes</label>
-            <textarea name="admin_notes" id="id_admin_notes" rows="3" class="form-textarea" placeholder="Internal verification comments...">{{ app.admin_notes }}</textarea>
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700;">
-            💾 Save &amp; Update Verification
-          </button>
-        </form>
       </div>
     </div>
 

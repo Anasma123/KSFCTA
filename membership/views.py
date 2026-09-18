@@ -333,30 +333,6 @@ def admin_member_detail_view(request, pk):
 
     app = get_object_or_404(MembershipApplication, pk=pk)
 
-    if request.method == 'POST':
-        app.status = request.POST.get('status', app.status)
-        app.payment_status = request.POST.get('payment_status', app.payment_status)
-        app.membership_no = request.POST.get('membership_no', app.membership_no).strip()
-        app.receipt_no = request.POST.get('receipt_no', app.receipt_no).strip()
-        app.membership_fee = request.POST.get('membership_fee', app.membership_fee).strip()
-        app.approved_by = request.POST.get('approved_by', app.approved_by).strip()
-        app.admin_notes = request.POST.get('admin_notes', app.admin_notes).strip()
-        app.rejection_reason = request.POST.get('rejection_reason', app.rejection_reason).strip()
-        
-        # If admin marks as Approved, ensure payment is verified and verified_at timestamp is set
-        if app.status == 'Approved':
-            app.payment_status = 'Verified'
-            if not app.verified_at:
-                app.verified_at = timezone.now()
-            if not app.membership_no:
-                app.membership_no = f"KSFCTA/MEM/{app.created_at.year}/{app.id:04d}"
-            app.rejection_reason = ''
-        elif app.status == 'Rejected':
-            app.payment_status = 'Rejected'
-
-        app.save()
-        messages.success(request, f"Updated verification details for {app.full_name} ({app.application_no}).")
-        return redirect('admin_member_detail', pk=app.id)
 
     return render(request, 'membership/member_detail.html', {'app': app})
 

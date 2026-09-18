@@ -176,20 +176,34 @@
 
     <!-- RIGHT: Fee Payment & Proof Verification -->
     <div>
-      {% if app.payment_status != 'Verified' %}
       <div class="portal-card">
-        <h3 class="portal-card-title-sm">Membership Fee &amp; Payment (₹ 200)</h3>
-        
-        <div style="text-align: center; margin-bottom: 18px;">
-          <img src="{% static 'images/payment_qr.jpeg' %}" alt="Payment QR Code" style="width: 170px; height: 170px; object-fit: contain; margin: 0 auto 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 6px; background: #FFFFFF;" />
-          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Scan QR to pay ₹ 200 via any UPI App</span>
+        <h3 class="portal-card-title-sm">Payment Status</h3>
+        <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 14px; margin-bottom: 16px;">
+          <div style="font-size: 0.95rem; margin-bottom: 8px;">
+            Status: 
+            {% if app.payment_status == 'Verified' %}
+              <strong style="color: #059669;">✔ Verified</strong>
+            {% elif app.payment_status == 'Rejected' %}
+              <strong style="color: #DC2626;">✕ Rejected</strong>
+            {% else %}
+              <strong style="color: #D97706;">⏳ Pending Verification</strong>
+            {% endif %}
+          </div>
+          {% if app.transaction_id %}
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Txn ID: {{ app.transaction_id }}</div>
+          {% endif %}
         </div>
 
-        <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 14px; font-size: 0.85rem; margin-bottom: 18px;">
-          <div><strong>Account Name:</strong> SHAFI K</div>
-          <div><strong>A/C No:</strong> 1704110010052111</div>
-          <div><strong>IFSC Code:</strong> UJVN0001704</div>
-          <div style="margin-top: 4px; color: var(--primary-blue); font-weight: 700;">Amount: ₹ 200</div>
+        {% if app.payment_status == 'Rejected' %}
+        <div style="background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: var(--radius-md); padding: 14px; margin-bottom: 18px;">
+          <h4 style="color: #B91C1C; font-size: 0.85rem; margin-bottom: 4px;">Payment Rejected</h4>
+          <p style="font-size: 0.8rem; color: #991B1B;">{{ app.rejection_reason|default:"Your payment could not be verified. Please re-upload the correct UPI transaction ID and screenshot below." }}</p>
+        </div>
+
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 12px; border-top: 1px solid var(--border-light); padding-top: 16px;">Re-submit Payment Proof</h4>
+        <div style="text-align: center; margin-bottom: 18px;">
+          <img src="{% static 'images/payment_qr.jpeg' %}" alt="Payment QR Code" style="width: 150px; height: 150px; object-fit: contain; margin: 0 auto 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 6px; background: #FFFFFF;" />
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Scan QR to pay ₹ 200 via any UPI App</span>
         </div>
 
         <form method="post" enctype="multipart/form-data">
@@ -202,21 +216,16 @@
           </div>
 
           <div style="margin-bottom: 16px;">
-            <label class="field-label" for="member_screenshot">Upload Payment Receipt Screenshot</label>
-            <input type="file" name="payment_screenshot" id="member_screenshot" accept="image/*" class="form-file" />
-            {% if app.payment_screenshot %}
-              <div style="margin-top: 6px; font-size: 0.8rem; color: #059669;">
-                ✔ Current receipt uploaded. <a href="{{ app.payment_screenshot }}" target="_blank" style="text-decoration: underline;">View</a>
-              </div>
-            {% endif %}
+            <label class="field-label" for="member_screenshot">Upload New Payment Screenshot</label>
+            <input type="file" name="payment_screenshot" id="member_screenshot" accept="image/*" class="form-file" required />
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 0.92rem;">
-            Submit Payment Proof
+            Submit New Payment Proof
           </button>
         </form>
+        {% endif %}
       </div>
-      {% endif %}
     </div>
 
   </div>
