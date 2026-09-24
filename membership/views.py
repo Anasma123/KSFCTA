@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
@@ -256,8 +257,12 @@ def admin_portal_view(request):
     districts = [d[0] for d in MembershipApplication.DISTRICT_CHOICES]
     wings = [w[0] for w in MembershipApplication.WING_CHOICES]
 
+    paginator = Paginator(queryset, 50)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'applications': queryset,
+        'applications': page_obj,
         'total_count': total_count,
         'approved_count': approved_count,
         'pending_count': pending_count,
@@ -388,10 +393,14 @@ def admin_wings_view(request):
         w: MembershipApplication.objects.filter(wing=w).count() for w in wings_list
     }
 
+    paginator = Paginator(queryset, 50)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'wings_list': wings_list,
         'selected_wing': selected_wing,
-        'applications': queryset,
+        'applications': page_obj,
         'wing_total': wing_total,
         'wing_approved': wing_approved,
         'wing_pending': wing_pending,
@@ -456,10 +465,14 @@ def admin_districts_view(request):
         d: MembershipApplication.objects.filter(district=d).count() for d in districts_list
     }
 
+    paginator = Paginator(queryset, 50)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'districts_list': districts_list,
         'selected_district': selected_district,
-        'applications': queryset,
+        'applications': page_obj,
         'district_total': district_total,
         'district_approved': district_approved,
         'district_pending': district_pending,

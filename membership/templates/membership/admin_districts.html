@@ -109,7 +109,7 @@
 
         <!-- Sorting -->
         <div>
-          <select name="sort" class="form-select">
+          <select name="sort" class="form-select" onchange="this.form.submit()">
             <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Sort: Newest First</option>
             <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
             <option value="name_asc" {% if current_sort == 'name_asc' %}selected{% endif %}>Sort: Name (A to Z)</option>
@@ -121,7 +121,8 @@
 
         <!-- Submit & Reset Buttons -->
         <div style="display: flex; gap: 6px;">
-          <button type="submit" class="btn btn-primary" style="padding: 10px 18px;">Filter</button>
+          <!-- "Filter" button hidden since form autosubmits on dropdown change, user can press enter for search box -->
+          <button type="submit" class="btn btn-primary" style="display: none;">Filter</button>
           {% if current_q or current_sort != 'newest' %}
           <a href="{% url 'admin_districts' %}?district={{ selected_district }}" class="btn btn-outline" style="padding: 10px 14px;" title="Reset filters">Reset</a>
           {% endif %}
@@ -150,7 +151,7 @@
           <th>Designation &amp; College</th>
           <th>Payment (₹200)</th>
           <th>Verification Status</th>
-          <th style="text-align: right;">1-Step Action &amp; Certificate</th>
+          <th style="text-align: right; min-width: 320px;">1-Step Action &amp; Certificate</th>
         </tr>
       </thead>
       <tbody>
@@ -224,30 +225,30 @@
             {% endif %}
           </td>
           <td style="text-align: right;">
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
               <!-- 1-Step Verification Action Buttons -->
-              <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; width: 100%;">
                 {% if app.status != 'Approved' %}
-                  <a href="{% url 'admin_quick_action' app.id 'accept' %}" class="btn btn-success" style="padding: 4px 10px; font-size: 0.78rem;" title="1-Click Accept & Verify both profile & payment">
+                  <a href="{% url 'admin_quick_action' app.id 'accept' %}" class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem; white-space: nowrap;" title="1-Click Accept & Verify both profile & payment">
                     ✔ Accept &amp; Verify
                   </a>
                 {% endif %}
                 {% if app.status != 'Rejected' %}
-                  <button type="button" onclick="openRejectModal('{{ app.id }}', '{{ app.full_name|escapejs }}', '{{ app.application_no|escapejs }}')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.78rem; color: #DC2626 !important; border-color: #FCA5A5; cursor: pointer;" title="Reject Application with reason">
+                  <button type="button" onclick="openRejectModal('{{ app.id }}', '{{ app.full_name|escapejs }}', '{{ app.application_no|escapejs }}')" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem; color: #DC2626 !important; border-color: #FCA5A5; cursor: pointer; white-space: nowrap;" title="Reject Application with reason">
                     ✕ Reject
                   </button>
                 {% endif %}
-                <a href="{% url 'admin_member_detail' app.id %}" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.78rem;">
+                <a href="{% url 'admin_member_detail' app.id %}" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem; white-space: nowrap;">
                   👁️ Details
                 </a>
               </div>
 
               <!-- Certificate Download Links -->
-              <div style="display: flex; gap: 4px;">
-                <a href="{% url 'export_letterhead_pdf' app.id %}" class="btn btn-outline" style="padding: 3px 8px; font-size: 0.74rem; background: #EFF6FF; border-color: #93C5FD; color: #1D4ED8 !important;" title="Download official letter pad certificate">
+              <div style="display: flex; gap: 6px; justify-content: flex-end; width: 100%;">
+                <a href="{% url 'export_letterhead_pdf' app.id %}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.78rem; background: #EFF6FF; border-color: #93C5FD; color: #1D4ED8 !important; white-space: nowrap;" title="Download official letter pad certificate">
                   📄 Letterhead PDF
                 </a>
-                <a href="{% url 'export_single_docx' app.id %}" class="btn btn-outline" style="padding: 3px 8px; font-size: 0.74rem; color: #475569 !important;" title="Download Word application">
+                <a href="{% url 'export_single_docx' app.id %}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.78rem; color: #475569 !important; white-space: nowrap;" title="Download Word application">
                   📘 Word
                 </a>
               </div>
@@ -264,6 +265,25 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Pagination Controls -->
+  {% if applications.has_other_pages %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; background: #FFFFFF; padding: 12px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+    <div>
+      {% if applications.has_previous %}
+      <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ applications.previous_page_number }}" class="btn btn-outline" style="padding: 8px 16px;">&laquo; Previous</a>
+      {% endif %}
+    </div>
+    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);">
+      Page {{ applications.number }} of {{ applications.paginator.num_pages }}
+    </div>
+    <div>
+      {% if applications.has_next %}
+      <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ applications.next_page_number }}" class="btn btn-outline" style="padding: 8px 16px;">Next &raquo;</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 
   <!-- REJECTION REASON MODAL -->
   <div id="rejectModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">

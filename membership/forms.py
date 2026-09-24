@@ -26,12 +26,10 @@ class MembershipRegistrationForm(forms.ModelForm):
     )
 
     transaction_id = forms.CharField(
-        required=True,
-        error_messages={'required': 'Transaction ID / UTR Number is required to verify your payment.'},
+        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Enter 12-digit UPI / UTR / Transaction ID (Mandatory)',
-            'required': True,
+            'placeholder': 'Enter 12-digit UPI / UTR / Transaction ID (Optional)',
             'id': 'id_transaction_id'
         }),
         label="Transaction ID / UTR Number"

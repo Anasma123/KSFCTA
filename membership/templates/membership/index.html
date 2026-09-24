@@ -378,7 +378,7 @@
                   <div><strong>IFSC Code:</strong> <span style="font-weight: 800; font-family: monospace; font-size: 1.05rem;">UJVN0001704</span></div>
                 </div>
                 <p style="font-size: 0.84rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
-                  Scan the QR code above or transfer directly to the bank account. After payment, enter your <strong>Transaction ID / UTR Number</strong> below (mandatory) and upload the receipt screenshot.
+                  Scan the QR code above or transfer directly to the bank account. After payment, enter your <strong>Transaction ID / UTR Number</strong> below and upload the receipt screenshot.
                 </p>
               </div>
             </div>
@@ -386,10 +386,10 @@
             <div class="form-grid-2" style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-light);">
               <div class="field-wrapper" style="margin-bottom: 0;">
                 <label class="field-label" for="id_transaction_id" style="font-weight: 800; color: #0F2B5C;">
-                  Transaction ID / UTR Number<span class="req">*</span>
+                  Transaction ID / UTR Number
                 </label>
                 {{ form.transaction_id }}
-                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">Mandatory field. Enter the 12-digit UTR or Transaction ID from your payment app.</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">Optional field. Enter the 12-digit UTR or Transaction ID from your payment app.</div>
               </div>
               <div class="field-wrapper" style="margin-bottom: 0;">
                 <label class="field-label" for="id_payment_screenshot" style="font-weight: 800; color: #0F2B5C;">
@@ -489,7 +489,18 @@
     </div>
     <div class="footer-bottom">
       <p>&copy; 2026 Kerala Self Financing College Teachers’ Association (KSFCTA). All Rights Reserved.</p>
-      <p style="margin-top: 4px; font-size: 0.78rem;">One Organisation • One Voice • One Stronger Teachers’ Community.</p>
+      <p style="margin-top: 4px; font-size: 0.78rem; margin-bottom: 12px;">One Organisation • One Voice • One Stronger Teachers’ Community.</p>
+      
+      <p style="margin-top: 12px; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 8px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+        Developed by <a href="https://cognilearn.org/" target="_blank" style="color: #60A5FA; text-decoration: none; font-weight: 700;">Cognilearn</a>
+        <a href="https://www.instagram.com/cognilearn.lab?stkn=MWh1NWh2OTlibDIweg==" target="_blank" style="color: #F472B6; display: flex; align-items: center;" title="Cognilearn on Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      </p>
     </div>
   </div>
 </footer>
