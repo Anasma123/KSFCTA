@@ -213,19 +213,6 @@
         </div>
       </div>
 
-      {% if form.errors %}
-      <div style="background: #FEE2E2; border: 1.5px solid #F87171; border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; color: #B91C1C;">
-        <strong>Please correct the errors below:</strong>
-        <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.9rem;">
-          {% for field, errors in form.errors.items %}
-            {% for error in errors %}
-              <li><strong>{{ field|title }}:</strong> {{ error }}</li>
-            {% endfor %}
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-
       <form method="post" enctype="multipart/form-data" id="membership-form">
         {% csrf_token %}
 
@@ -542,6 +529,54 @@
     </form>
   </div>
 </div>
+
+<!-- Registration Error Modal -->
+{% if form.errors %}
+<div id="form-error-modal" style="display: flex; position: fixed; inset: 0; z-index: 99999; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px;">
+  <div style="background: #FFFFFF; width: 90%; max-width: 500px; border-radius: 20px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+    <div style="width: 64px; height: 64px; background: #FEE2E2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #DC2626;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    </div>
+    <h3 style="font-size: 1.4rem; font-weight: 800; color: #0F172A; text-align: center; margin-bottom: 12px;">Action Required!</h3>
+    <p style="font-size: 0.95rem; color: #64748B; text-align: center; line-height: 1.5; margin-bottom: 24px;">
+      We couldn't process your registration because some information is missing or incorrect. Please review the details below:
+    </p>
+    
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; margin-bottom: 24px; max-height: 250px; overflow-y: auto;">
+      <ul style="margin: 0; padding-left: 20px; color: #B91C1C; font-size: 0.95rem; line-height: 1.6;">
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+            <li style="margin-bottom: 10px;">
+              <strong style="color: #0F172A;">{% if field == '__all__' %}General Error{% else %}{{ field|title }}{% endif %}:</strong> 
+              <span style="color: #475569;">{{ error }}</span>
+            </li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    
+    <button onclick="document.getElementById('form-error-modal').style.display='none'" class="btn btn-primary" style="width: 100%; padding: 14px; font-weight: 700; border-radius: 10px; background: #0F2B5C;">
+      I will fix this
+    </button>
+  </div>
+</div>
+<style>
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const errorModal = document.getElementById('form-error-modal');
+    if (errorModal) {
+      errorModal.querySelector('button').addEventListener('click', function() {
+        document.getElementById('register').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  });
+</script>
+{% endif %}
 
 {% endblock %}
 
