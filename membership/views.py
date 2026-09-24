@@ -246,13 +246,27 @@ def admin_portal_view(request):
     sort_by = request.GET.get('sort', 'newest').strip()
     tab = request.GET.get('tab', 'all').strip().lower()
 
-    # KPI counts across all applications
-    total_count = MembershipApplication.objects.count()
-    approved_count = MembershipApplication.objects.filter(status='Approved').count()
-    pending_count = MembershipApplication.objects.filter(status='Pending').count()
-    rejected_count = MembershipApplication.objects.filter(status='Rejected').count()
-    payment_verified_count = MembershipApplication.objects.filter(payment_status='Verified').count()
-    payment_pending_count = MembershipApplication.objects.filter(payment_status='Pending Verification').count()
+    # Get a base queryset for KPIs that respects search and structural filters but ignores status/tabs
+    base_qs = MembershipApplication.objects.all()
+    if q:
+        base_qs = base_qs.filter(
+            Q(full_name__icontains=q) | Q(application_no__icontains=q) |
+            Q(institution__icontains=q) | Q(mobile__icontains=q) |
+            Q(email__icontains=q) | Q(wing__icontains=q) |
+            Q(other_wing__icontains=q) | Q(transaction_id__icontains=q)
+        )
+    if wing_filter:
+        base_qs = base_qs.filter(wing=wing_filter)
+    if district_filter:
+        base_qs = base_qs.filter(district=district_filter)
+
+    # KPI counts based on the dynamic filtered results
+    total_count = base_qs.count()
+    approved_count = base_qs.filter(status='Approved').count()
+    pending_count = base_qs.filter(status='Pending').count()
+    rejected_count = base_qs.filter(status='Rejected').count()
+    payment_verified_count = base_qs.filter(payment_status='Verified').count()
+    payment_pending_count = base_qs.filter(payment_status='Pending Verification').count()
 
     districts = [d[0] for d in MembershipApplication.DISTRICT_CHOICES]
     wings = [w[0] for w in MembershipApplication.WING_CHOICES]
@@ -382,13 +396,13 @@ def admin_wings_view(request):
     order_fields = valid_sorts.get(sort_by, ['-created_at'])
     queryset = queryset.order_by(*order_fields)
 
-    # Counts for this wing
-    wing_total = MembershipApplication.objects.filter(wing=selected_wing).count()
-    wing_approved = MembershipApplication.objects.filter(wing=selected_wing, status='Approved').count()
-    wing_pending = MembershipApplication.objects.filter(wing=selected_wing, status='Pending').count()
-    wing_rejected = MembershipApplication.objects.filter(wing=selected_wing, status='Rejected').count()
+    # Counts for this wing, taking search into account
+    wing_total = queryset.count()
+    wing_approved = queryset.filter(status='Approved').count()
+    wing_pending = queryset.filter(status='Pending').count()
+    wing_rejected = queryset.filter(status='Rejected').count()
 
-    # Wing count map for badges
+    # Wing count map for badges (still absolute counts for navigation tabs)
     wing_counts = {
         w: MembershipApplication.objects.filter(wing=w).count() for w in wings_list
     }
@@ -454,13 +468,13 @@ def admin_districts_view(request):
     order_fields = valid_sorts.get(sort_by, ['-created_at'])
     queryset = queryset.order_by(*order_fields)
 
-    # Counts for this district
-    district_total = MembershipApplication.objects.filter(district=selected_district).count()
-    district_approved = MembershipApplication.objects.filter(district=selected_district, status='Approved').count()
-    district_pending = MembershipApplication.objects.filter(district=selected_district, status='Pending').count()
-    district_rejected = MembershipApplication.objects.filter(district=selected_district, status='Rejected').count()
+    # Counts for this district, taking search into account
+    district_total = queryset.count()
+    district_approved = queryset.filter(status='Approved').count()
+    district_pending = queryset.filter(status='Pending').count()
+    district_rejected = queryset.filter(status='Rejected').count()
 
-    # District count map for badges
+    # District count map for badges (still absolute counts for navigation tabs)
     district_counts = {
         d: MembershipApplication.objects.filter(district=d).count() for d in districts_list
     }
