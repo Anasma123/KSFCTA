@@ -246,27 +246,13 @@ def admin_portal_view(request):
     sort_by = request.GET.get('sort', 'newest').strip()
     tab = request.GET.get('tab', 'all').strip().lower()
 
-    # Get a base queryset for KPIs that respects search and structural filters but ignores status/tabs
-    base_qs = MembershipApplication.objects.all()
-    if q:
-        base_qs = base_qs.filter(
-            Q(full_name__icontains=q) | Q(application_no__icontains=q) |
-            Q(institution__icontains=q) | Q(mobile__icontains=q) |
-            Q(email__icontains=q) | Q(wing__icontains=q) |
-            Q(other_wing__icontains=q) | Q(transaction_id__icontains=q)
-        )
-    if wing_filter:
-        base_qs = base_qs.filter(wing=wing_filter)
-    if district_filter:
-        base_qs = base_qs.filter(district=district_filter)
-
-    # KPI counts based on the dynamic filtered results
-    total_count = base_qs.count()
-    approved_count = base_qs.filter(status='Approved').count()
-    pending_count = base_qs.filter(status='Pending').count()
-    rejected_count = base_qs.filter(status='Rejected').count()
-    payment_verified_count = base_qs.filter(payment_status='Verified').count()
-    payment_pending_count = base_qs.filter(payment_status='Pending Verification').count()
+    # KPI counts strictly follow ALL applied filters
+    total_count = queryset.count()
+    approved_count = queryset.filter(status='Approved').count()
+    pending_count = queryset.filter(status='Pending').count()
+    rejected_count = queryset.filter(status='Rejected').count()
+    payment_verified_count = queryset.filter(payment_status='Verified').count()
+    payment_pending_count = queryset.filter(payment_status='Pending Verification').count()
 
     districts = [d[0] for d in MembershipApplication.DISTRICT_CHOICES]
     wings = [w[0] for w in MembershipApplication.WING_CHOICES]

@@ -109,7 +109,7 @@
 
         <!-- Sorting -->
         <div>
-          <select name="sort" class="form-select" onchange="this.form.submit()">
+          <select name="sort" class="form-select">
             <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Sort: Newest First</option>
             <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
             <option value="name_asc" {% if current_sort == 'name_asc' %}selected{% endif %}>Sort: Name (A to Z)</option>
@@ -121,8 +121,7 @@
 
         <!-- Submit & Reset Buttons -->
         <div style="display: flex; gap: 6px;">
-          <!-- "Filter" button hidden since form autosubmits on dropdown change, user can press enter for search box -->
-          <button type="submit" class="btn btn-primary" style="display: none;">Filter</button>
+          <button type="submit" class="btn btn-primary" style="padding: 10px 18px; font-weight: 700;">Apply Filters</button>
           {% if current_q or current_sort != 'newest' %}
           <a href="{% url 'admin_wings' %}?wing={{ selected_wing }}" class="btn btn-outline" style="padding: 10px 14px;" title="Reset filters">Reset</a>
           {% endif %}

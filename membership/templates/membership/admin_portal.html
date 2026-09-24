@@ -108,7 +108,7 @@
 
         <!-- Wing Filter -->
         <div>
-          <select name="wing" class="form-select" onchange="this.form.submit()">
+          <select name="wing" class="form-select">
             <option value="">All Wings</option>
             {% for w in wings %}
               <option value="{{ w }}" {% if current_wing == w %}selected{% endif %}>{{ w }}</option>
@@ -118,7 +118,7 @@
 
         <!-- District Filter -->
         <div>
-          <select name="district" class="form-select" onchange="this.form.submit()">
+          <select name="district" class="form-select">
             <option value="">All Districts</option>
             {% for d in districts %}
               <option value="{{ d }}" {% if current_district == d %}selected{% endif %}>{{ d }}</option>
@@ -128,7 +128,7 @@
 
         <!-- Status Filter -->
         <div>
-          <select name="status" class="form-select" onchange="this.form.submit()">
+          <select name="status" class="form-select">
             <option value="">All Application Status</option>
             <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
             <option value="Approved" {% if current_status == 'Approved' %}selected{% endif %}>Approved / Accepted</option>
@@ -138,7 +138,7 @@
 
         <!-- Payment Status Filter -->
         <div>
-          <select name="payment_status" class="form-select" onchange="this.form.submit()">
+          <select name="payment_status" class="form-select">
             <option value="">All Payments</option>
             <option value="Pending Verification" {% if current_payment == 'Pending Verification' %}selected{% endif %}>Pending Verification</option>
             <option value="Verified" {% if current_payment == 'Verified' %}selected{% endif %}>Payment Verified</option>
@@ -147,7 +147,7 @@
 
         <!-- Sorting -->
         <div>
-          <select name="sort" class="form-select" onchange="this.form.submit()">
+          <select name="sort" class="form-select">
             <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Sort: Newest First</option>
             <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
             <option value="wing_asc" {% if current_sort == 'wing_asc' %}selected{% endif %}>Sort: Wing (A to Z)</option>
@@ -160,8 +160,7 @@
 
         <!-- Submit & Reset Buttons -->
         <div style="display: flex; gap: 6px;">
-          <!-- "Apply" button hidden since form autosubmits on dropdown change, user can press enter for search box -->
-          <button type="submit" class="btn btn-primary" style="display: none;">Apply</button>
+          <button type="submit" class="btn btn-primary" style="padding: 10px 18px; font-weight: 700;">Apply Filters</button>
           {% if current_q or current_district or current_wing or current_status or current_payment or current_sort != 'newest' or current_tab != 'all' %}
           <a href="{% url 'admin_portal' %}" class="btn btn-outline" style="padding: 10px 14px;" title="Reset filters">Reset</a>
           {% endif %}
