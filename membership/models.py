@@ -149,7 +149,16 @@ class MembershipApplication(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.application_no:
-            count = MembershipApplication.objects.count() + 1
             year = timezone.now().year
-            self.application_no = f"KSFCTA-{year}-{count:04d}"
+            prefix = f"KSFCTA-{year}-"
+            last_app = MembershipApplication.objects.filter(application_no__startswith=prefix).order_by('application_no').last()
+            if last_app:
+                try:
+                    last_num = int(last_app.application_no.replace(prefix, ''))
+                    count = last_num + 1
+                except ValueError:
+                    count = 1
+            else:
+                count = 1
+            self.application_no = f"{prefix}{count:04d}"
         super().save(*args, **kwargs)

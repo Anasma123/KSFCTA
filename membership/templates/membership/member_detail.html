@@ -3,6 +3,157 @@
 
 {% block title %}Application Verification: {{ app.application_no }} | KSFCTA Admin{% endblock %}
 
+{% block extra_head %}
+<style>
+  /* Premium Delete Button */
+  .delete-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 18px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .delete-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+    background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+  }
+  .delete-action-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Super Cool Glassmorphism Modal */
+  .custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+  .custom-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .custom-modal-content {
+    background: #FFFFFF;
+    width: 90%;
+    max-width: 440px;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .custom-modal-overlay.active .custom-modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .modal-danger-icon {
+    width: 64px;
+    height: 64px;
+    background: #FEE2E2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #DC2626;
+    animation: pulse-red 2s infinite;
+  }
+  @keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  }
+
+  .modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0F172A;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .modal-desc {
+    font-size: 0.95rem;
+    color: #64748B;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+  .modal-user-highlight {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 12px;
+    font-weight: 700;
+    color: #334155;
+    font-size: 0.9rem;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .btn-modal-cancel {
+    flex: 1;
+    padding: 12px;
+    background: #F1F5F9;
+    color: #475569;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-modal-cancel:hover {
+    background: #E2E8F0;
+    color: #1E293B;
+  }
+  .btn-modal-confirm {
+    flex: 1;
+    padding: 12px;
+    background: #DC2626;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    transition: all 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+  }
+  .btn-modal-confirm:hover {
+    background: #B91C1C;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <nav class="admin-navbar">
   <div class="container admin-nav-inner">
@@ -71,9 +222,10 @@
         💳 Mark Payment Verified
       </a>
       {% endif %}
-      <a href="{% url 'admin_quick_action' app.id 'delete' %}" class="btn btn-outline" style="color: #FFFFFF !important; background-color: #DC2626; border-color: #B91C1C; padding: 8px 18px;" onclick="return confirm('Are you sure you want to permanently delete this member and their account? This cannot be undone.');">
-        🗑️ Delete
-      </a>
+      <button onclick="openDeleteModal()" class="btn btn-danger delete-action-btn" style="color: #FFFFFF !important;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+        <span>Delete</span>
+      </button>
     </div>
   </div>
 
@@ -203,4 +355,42 @@
   </div>
 
 </main>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="custom-modal-overlay">
+  <div class="custom-modal-content">
+    <div class="modal-danger-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+    </div>
+    <h3 class="modal-title">Delete Member?</h3>
+    <p class="modal-desc">
+      You are about to permanently delete this application. This action cannot be undone and all associated data will be lost.
+      <div class="modal-user-highlight">
+        {{ app.full_name }} ({{ app.application_no }})
+      </div>
+    </p>
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <a href="{% url 'admin_quick_action' app.id 'delete' %}" class="btn-modal-confirm">Yes, Delete Now</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openDeleteModal() {
+    document.getElementById('deleteModal').classList.add('active');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+  }
+  
+  // Close on clicking outside the modal content
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeDeleteModal();
+    }
+  });
+</script>
 {% endblock %}
