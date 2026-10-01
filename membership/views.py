@@ -83,9 +83,19 @@ def home_view(request):
     return render(request, 'membership/index.html', context)
 
 
+@never_cache
+@login_required(login_url='/login/')
 def registration_success_view(request, pk):
     """Confirmation page with member slip and instant letterhead download / portal access."""
     app = get_object_or_404(MembershipApplication, pk=pk)
+    
+    is_admin = request.user.is_staff or request.user.is_superuser
+    is_own_member = hasattr(request.user, 'application') and request.user.application.id == app.id
+    
+    if not (is_admin or is_own_member):
+        messages.error(request, "Unauthorized access.")
+        return redirect('home')
+        
     return render(request, 'membership/success.html', {'app': app})
 
 
@@ -96,6 +106,9 @@ def login_view(request):
     Authenticates both Admin (shafi / shafi@pulpara) and Members (email / password).
     """
     if request.user.is_authenticated:
+        next_url = request.GET.get('next')
+        if next_url:
+            return redirect(next_url)
         if request.user.is_staff or request.user.is_superuser:
             return redirect('admin_portal')
         return redirect('member_dashboard')
@@ -116,6 +129,9 @@ def login_view(request):
 
         if user is not None and user.is_active:
             login(request, user)
+            next_url = request.GET.get('next') or request.POST.get('next')
+            if next_url:
+                return redirect(next_url)
             if user.is_staff or user.is_superuser:
                 return redirect('admin_portal')
             return redirect('member_dashboard')
@@ -246,13 +262,24 @@ def admin_portal_view(request):
     sort_by = request.GET.get('sort', 'newest').strip()
     tab = request.GET.get('tab', 'all').strip().lower()
 
-    # KPI counts strictly follow ALL applied filters
-    total_count = queryset.count()
-    approved_count = queryset.filter(status='Approved').count()
-    pending_count = queryset.filter(status='Pending').count()
-    rejected_count = queryset.filter(status='Rejected').count()
-    payment_verified_count = queryset.filter(payment_status='Verified').count()
-    payment_pending_count = queryset.filter(payment_status='Pending Verification').count()
+    # KPI counts should be independent of the status tab filter but respect search/wing/district
+    base_qs = MembershipApplication.objects.all()
+    if q:
+        base_qs = base_qs.filter(
+            Q(full_name__icontains=q) | Q(application_no__icontains=q) |
+            Q(institution__icontains=q) | Q(mobile__icontains=q) |
+            Q(email__icontains=q) | Q(wing__icontains=q) |
+            Q(other_wing__icontains=q) | Q(transaction_id__icontains=q)
+        )
+    if wing_filter: base_qs = base_qs.filter(wing=wing_filter)
+    if district_filter: base_qs = base_qs.filter(district=district_filter)
+
+    total_count = base_qs.count()
+    approved_count = base_qs.filter(status='Approved').count()
+    pending_count = base_qs.filter(status='Pending').count()
+    rejected_count = base_qs.filter(status='Rejected').count()
+    payment_verified_count = base_qs.filter(payment_status='Verified').count()
+    payment_pending_count = base_qs.filter(payment_status='Pending Verification').count()
 
     districts = [d[0] for d in MembershipApplication.DISTRICT_CHOICES]
     wings = [w[0] for w in MembershipApplication.WING_CHOICES]
@@ -543,3 +570,22 @@ def export_summary_pdf_view(request):
     """Download master PDF summary list sorted and filtered."""
     queryset = get_filtered_queryset(request)
     return export_summary_pdf(queryset)
+
+
+import base64
+from django.http import Http404
+
+def member_photo_view(request, pk):
+    """Serve member photo directly as an image resource (BUG-22)"""
+    app = get_object_or_404(MembershipApplication, pk=pk)
+    if not app.photo:
+        raise Http404("No photo")
+    try:
+        header, encoded = app.photo.split(",", 1)
+        mime = header.split(";")[0].split(":")[1]
+        data = base64.b64decode(encoded)
+        response = HttpResponse(data, content_type=mime)
+        response['Cache-Control'] = 'public, max-age=31536000'
+        return response
+    except Exception:
+        raise Http404("Invalid photo data")

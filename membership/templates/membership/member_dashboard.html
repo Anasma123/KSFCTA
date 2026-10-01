@@ -44,7 +44,7 @@
     <div class="member-hero-top">
       <div class="member-hero-profile">
         {% if app.photo %}
-          <img src="{{ app.photo }}" alt="{{ app.full_name }}" class="member-hero-img" />
+          <img src="{% url 'member_photo' app.id %}" alt="{{ app.full_name }}" class="member-hero-img" />
         {% else %}
           <div class="member-hero-img-placeholder">No Photo</div>
         {% endif %}

@@ -32,10 +32,10 @@
       <p style="font-size: 0.92rem; color: var(--text-muted);">Manage applications, verify ₹200 fee payments, accept/reject, and issue letterhead certificates.</p>
     </div>
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="{% url 'export_excel' %}?q={{ current_q }}&wing={{ current_wing }}&district={{ current_district }}&status={{ current_status }}&payment_status={{ current_payment }}&sort={{ current_sort }}" class="btn btn-success" title="Download filtered & sorted spreadsheet">
+      <a href="{% url 'export_excel' %}?q={{ current_q|urlencode }}&wing={{ current_wing|urlencode }}&district={{ current_district|urlencode }}&status={{ current_status|urlencode }}&payment_status={{ current_payment|urlencode }}&sort={{ current_sort|urlencode }}&tab={{ current_tab|urlencode }}" class="btn btn-success" title="Download filtered & sorted spreadsheet">
         📗 Download Excel (.xlsx)
       </a>
-      <a href="{% url 'export_summary_pdf' %}?q={{ current_q }}&wing={{ current_wing }}&district={{ current_district }}&status={{ current_status }}&payment_status={{ current_payment }}&sort={{ current_sort }}" class="btn btn-outline" style="background: #FFFFFF; border-color: #CBD5E1;" title="Download filtered & sorted PDF summary">
+      <a href="{% url 'export_summary_pdf' %}?q={{ current_q|urlencode }}&wing={{ current_wing|urlencode }}&district={{ current_district|urlencode }}&status={{ current_status|urlencode }}&payment_status={{ current_payment|urlencode }}&sort={{ current_sort|urlencode }}&tab={{ current_tab|urlencode }}" class="btn btn-outline" style="background: #FFFFFF; border-color: #CBD5E1;" title="Download filtered & sorted PDF summary">
         📕 Download PDF Summary
       </a>
     </div>
@@ -108,7 +108,7 @@
 
         <!-- Wing Filter -->
         <div>
-          <select name="wing" class="form-select">
+          <select name="wing" class="form-select" aria-label="Filter by Wing">
             <option value="">All Wings</option>
             {% for w in wings %}
               <option value="{{ w }}" {% if current_wing == w %}selected{% endif %}>{{ w }}</option>
@@ -118,7 +118,7 @@
 
         <!-- District Filter -->
         <div>
-          <select name="district" class="form-select">
+          <select name="district" class="form-select" aria-label="Filter by District">
             <option value="">All Districts</option>
             {% for d in districts %}
               <option value="{{ d }}" {% if current_district == d %}selected{% endif %}>{{ d }}</option>
@@ -128,7 +128,7 @@
 
         <!-- Status Filter -->
         <div>
-          <select name="status" class="form-select">
+          <select name="status" class="form-select" aria-label="Filter by Application Status">
             <option value="">All Application Status</option>
             <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
             <option value="Approved" {% if current_status == 'Approved' %}selected{% endif %}>Approved / Accepted</option>
@@ -138,7 +138,7 @@
 
         <!-- Payment Status Filter -->
         <div>
-          <select name="payment_status" class="form-select">
+          <select name="payment_status" class="form-select" aria-label="Filter by Payment Status">
             <option value="">All Payments</option>
             <option value="Pending Verification" {% if current_payment == 'Pending Verification' %}selected{% endif %}>Pending Verification</option>
             <option value="Verified" {% if current_payment == 'Verified' %}selected{% endif %}>Payment Verified</option>
@@ -147,7 +147,7 @@
 
         <!-- Sorting -->
         <div>
-          <select name="sort" class="form-select">
+          <select name="sort" class="form-select" aria-label="Sort Results">
             <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Sort: Newest First</option>
             <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
             <option value="wing_asc" {% if current_sort == 'wing_asc' %}selected{% endif %}>Sort: Wing (A to Z)</option>
@@ -190,7 +190,7 @@
           <th>App No / Member ID</th>
           <th>Applicant</th>
           <th style="min-width: 170px;">
-            <a href="{% url 'admin_portal' %}?q={{ current_q }}&wing={{ current_wing }}&district={{ current_district }}&status={{ current_status }}&payment_status={{ current_payment }}&sort={% if current_sort == 'wing_asc' %}wing_desc{% else %}wing_asc{% endif %}" 
+            <a href="{% url 'admin_portal' %}?q={{ current_q|urlencode }}&wing={{ current_wing|urlencode }}&district={{ current_district|urlencode }}&status={{ current_status|urlencode }}&payment_status={{ current_payment|urlencode }}&sort={% if current_sort == 'wing_asc' %}wing_desc{% else %}wing_asc{% endif %}&tab={{ current_tab }}" 
                style="display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; font-weight: 700;" 
                title="Click to sort by Wing (A-Z / Z-A)">
               <span>Select Your Wing</span>
@@ -212,7 +212,7 @@
           <td>{{ forloop.counter }}</td>
           <td>
             {% if app.photo %}
-              <img src="{{ app.photo }}" alt="{{ app.full_name }}" style="width: 44px; height: 52px; object-fit: cover; border-radius: 4px; border: 1px solid #CBD5E1; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />
+              <img src="{% url 'member_photo' app.id %}" alt="{{ app.full_name }}" style="width: 44px; height: 52px; object-fit: cover; border-radius: 4px; border: 1px solid #CBD5E1; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" loading="lazy" />
             {% else %}
               <div style="width: 44px; height: 52px; background: #F1F5F9; border-radius: 4px; border: 1px dashed #CBD5E1; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #94A3B8; text-align: center;">No Photo</div>
             {% endif %}

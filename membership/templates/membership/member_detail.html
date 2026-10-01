@@ -322,7 +322,7 @@
         {% if app.payment_screenshot %}
           <div style="margin-top: 18px; border-top: 1px solid #BBF7D0; padding-top: 14px;">
             <span style="font-size: 0.8rem; font-weight: 700; color: #166534; display: block; margin-bottom: 8px;">Uploaded Receipt Screenshot:</span>
-            <a href="{{ app.payment_screenshot }}" target="_blank">
+            <a href="{{ app.payment_screenshot }}" download="receipt_{{ app.application_no }}.png" title="Click to download receipt">
               <img src="{{ app.payment_screenshot }}" alt="Payment Receipt" style="max-height: 240px; border-radius: var(--radius-md); border: 1px solid #86EFAC; box-shadow: var(--shadow-sm);" />
             </a>
           </div>

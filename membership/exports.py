@@ -269,9 +269,12 @@ def export_single_application_docx(app):
         c0.paragraphs[0].runs[0].bold = True
 
         c1.text = label
+        c1.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         c1.paragraphs[0].runs[0].bold = True
 
         c2.text = str(val or '')
+        if c2.text:
+            c2.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
         if idx % 2 == 0:
             set_cell_background(c0, "F8FAFC")

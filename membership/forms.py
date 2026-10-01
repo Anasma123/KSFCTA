@@ -112,6 +112,7 @@ class MembershipRegistrationForm(forms.ModelForm):
                 'type': 'tel',
                 'placeholder': '10-digit mobile number',
                 'pattern': '[0-9]{10}',
+                'maxlength': '10',
                 'required': True,
                 'id': 'id_mobile'
             }),
@@ -197,7 +198,22 @@ class MembershipRegistrationForm(forms.ModelForm):
 
     def clean_full_name(self):
         name = self.cleaned_data.get('full_name', '')
+        if not any(c.isalpha() for c in name):
+            raise forms.ValidationError("Name must contain alphabetic characters.")
         return name.strip().upper()
+        
+    def clean_institution(self):
+        institution = self.cleaned_data.get('institution', '')
+        if not any(c.isalpha() for c in institution):
+            raise forms.ValidationError("Institution name must contain alphabetic characters.")
+        return institution.strip()
+
+    def clean_dob(self):
+        import datetime
+        dob = self.cleaned_data.get('dob')
+        if dob and dob > datetime.date.today():
+            raise forms.ValidationError("Date of birth cannot be in the future.")
+        return dob
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '').strip().lower()

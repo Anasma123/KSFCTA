@@ -20,6 +20,7 @@ urlpatterns = [
     path('export/docx/<int:pk>/', views.export_single_docx_view, name='export_single_docx'),
     path('export/letterhead-pdf/<int:pk>/', views.export_letterhead_pdf_view, name='export_letterhead_pdf'),
     path('export/pdf-summary/', views.export_summary_pdf_view, name='export_summary_pdf'),
+    path('member-photo/<int:pk>/', views.member_photo_view, name='member_photo'),
 ]
 
 import os

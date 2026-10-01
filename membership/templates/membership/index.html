@@ -583,10 +583,68 @@
         document.getElementById('register').scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     }
+    
+    // Programmatically connect errors to fields for accessibility (BUG-21)
+    {% for field, errors in form.errors.items %}
+      {% if field != '__all__' %}
+        var fieldInput = document.getElementById("id_{{ field }}");
+        if (fieldInput) {
+          fieldInput.setAttribute("aria-invalid", "true");
+          var errorSpan = document.createElement("span");
+          errorSpan.id = "error_id_{{ field }}";
+          errorSpan.style.color = "#DC2626";
+          errorSpan.style.fontSize = "0.85rem";
+          errorSpan.style.display = "block";
+          errorSpan.style.marginTop = "4px";
+          errorSpan.setAttribute("role", "alert");
+          errorSpan.innerText = "{{ errors.0|escapejs }}";
+          fieldInput.parentNode.appendChild(errorSpan);
+          fieldInput.setAttribute("aria-describedby", "error_id_{{ field }}");
+          fieldInput.style.borderColor = "#DC2626";
+        }
+      {% endif %}
+    {% endfor %}
   });
 </script>
 {% endif %}
 
+<script>
+  // Show/Hide password toggle (BUG-14)
+  document.addEventListener("DOMContentLoaded", function() {
+    const pwFields = document.querySelectorAll('input[type="password"]');
+    pwFields.forEach(field => {
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'relative';
+      field.parentNode.insertBefore(wrapper, field);
+      wrapper.appendChild(field);
+      
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.innerHTML = '👁️';
+      toggleBtn.style.position = 'absolute';
+      toggleBtn.style.right = '10px';
+      toggleBtn.style.top = '50%';
+      toggleBtn.style.transform = 'translateY(-50%)';
+      toggleBtn.style.background = 'none';
+      toggleBtn.style.border = 'none';
+      toggleBtn.style.cursor = 'pointer';
+      toggleBtn.style.fontSize = '1.1rem';
+      toggleBtn.setAttribute('aria-label', 'Toggle password visibility');
+      
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (field.type === 'password') {
+          field.type = 'text';
+          toggleBtn.innerHTML = '🙈';
+        } else {
+          field.type = 'password';
+          toggleBtn.innerHTML = '👁️';
+        }
+      });
+      wrapper.appendChild(toggleBtn);
+    });
+  });
+</script>
 {% endblock %}
 
 {% block extra_js %}
@@ -747,14 +805,49 @@
     setupFileCompressor('id_payment_screenshot', 1280, 1600, 0.80, 'receipt-compress-badge');
   });
 
+  function trapFocus(e) {
+    if (e.key === 'Escape') {
+      closeLoginModal();
+      return;
+    }
+    const modal = document.getElementById('login-modal');
+    if (modal.style.display !== 'flex') return;
+    
+    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
+
   function openLoginModal() {
     const modal = document.getElementById('login-modal');
     modal.style.display = 'flex';
+    document.addEventListener('keydown', trapFocus);
+    setTimeout(() => {
+      const input = document.getElementById('modal_user');
+      if (input) input.focus();
+    }, 50);
   }
 
   function closeLoginModal() {
     const modal = document.getElementById('login-modal');
     modal.style.display = 'none';
+    document.removeEventListener('keydown', trapFocus);
   }
 
   {% if login_error %}
