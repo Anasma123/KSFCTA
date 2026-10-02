@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponse
+import datetime
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from .models import MembershipApplication
@@ -24,6 +25,10 @@ def home_view(request):
     Public home page with online registration (including wings & ₹200 payment),
     direct portal login modal/section, and exact campaign contents.
     """
+    campaign_start = timezone.make_aware(datetime.datetime(2026, 10, 2, 0, 0, 0))
+    campaign_end = timezone.make_aware(datetime.datetime(2026, 11, 14, 23, 59, 59))
+    campaign_active = campaign_start <= timezone.now() <= campaign_end
+
     form = MembershipRegistrationForm()
     login_error = None
 
@@ -51,34 +56,38 @@ def home_view(request):
 
     # Handle registration form submission
     elif request.method == 'POST':
-        form = MembershipRegistrationForm(request.POST, request.FILES)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
+        if not campaign_active:
+            messages.error(request, "Membership campaign is currently closed.")
+        else:
+            form = MembershipRegistrationForm(request.POST, request.FILES)
+            if form.is_valid():
+                email = form.cleaned_data['email']
+                password = form.cleaned_data['password']
 
-            # Create User account for applicant login
-            user = User.objects.create_user(
-                username=email,
-                email=email,
-                password=password,
-                first_name=form.cleaned_data['full_name'][:30]
-            )
+                # Create User account for applicant login
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=password,
+                    first_name=form.cleaned_data['full_name'][:30]
+                )
 
-            app = form.save(commit=False)
-            app.user = user
-            app.membership_fee = '₹ 200'
-            app.save()
+                app = form.save(commit=False)
+                app.user = user
+                app.membership_fee = '₹ 200'
+                app.save()
 
-            # Auto log in the new member
-            login(request, user)
-            messages.success(request, f"Registration Successful! Welcome, {app.full_name}. Your Application No is {app.application_no}.")
-            return redirect('registration_success', pk=app.id)
+                # Auto log in the new member
+                login(request, user)
+                messages.success(request, f"Registration Successful! Welcome, {app.full_name}. Your Application No is {app.application_no}.")
+                return redirect('registration_success', pk=app.id)
 
     registered_count = MembershipApplication.objects.count()
     context = {
         'form': form,
         'registered_count': registered_count,
         'login_error': login_error,
+        'campaign_active': campaign_active,
     }
     return render(request, 'membership/index.html', context)
 

@@ -213,6 +213,7 @@
         </div>
       </div>
 
+      {% if campaign_active %}
       <form method="post" enctype="multipart/form-data" id="membership-form">
         {% csrf_token %}
 
@@ -407,6 +408,13 @@
           ✍️ JOIN NOW – SUBMIT REGISTRATION &amp; PAYMENT
         </button>
       </form>
+      {% else %}
+      <div style="padding: 40px; text-align: center; background: #FEF2F2; border-radius: 12px; border: 1px solid #FCA5A5; margin-top: 20px;">
+        <h3 style="color: #B91C1C; margin-bottom: 12px;">Registration Closed</h3>
+        <p style="font-size: 1.1rem; color: #991B1B;">The Membership Campaign 2026 is currently closed.</p>
+        <p style="font-size: 0.95rem; color: #991B1B; margin-top: 8px;">Registration was open from <strong>2 October 2026</strong> to <strong>14 November 2026</strong>.</p>
+      </div>
+      {% endif %}
     </div>
   </div>
 </section>
