@@ -659,12 +659,32 @@
 
 {% block extra_js %}
 <script>
-  // Countdown to 2 October 2026
+  // Countdown logic for Campaign Window
   (function() {
-    const targetDate = new Date('2026-10-02T00:00:00').getTime();
+    const startDate = new Date('2026-10-02T00:00:00').getTime();
+    const endDate = new Date('2026-11-14T23:59:59').getTime();
 
     function updateCountdown() {
       const now = new Date().getTime();
+      let targetDate;
+      let labelText = "Campaign Timeline";
+
+      if (now < startDate) {
+        targetDate = startDate;
+        labelText = "Campaign Starts In";
+      } else if (now <= endDate) {
+        targetDate = endDate;
+        labelText = "Campaign Ends In";
+      } else {
+        targetDate = now; // diff will be 0
+        labelText = "Campaign Ended";
+      }
+
+      const titleEl = document.querySelector('.countdown-info h3');
+      if (titleEl && titleEl.textContent !== labelText) {
+          titleEl.textContent = labelText;
+      }
+
       const diff = targetDate - now;
 
       if (diff <= 0) {
